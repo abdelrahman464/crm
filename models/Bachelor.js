@@ -28,6 +28,11 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    currentStep:{
+      type: DataTypes.ENUM("step_0", "step_1", "step_2", "step_3", "step_4", "step_5"),
+      defaultValue: "step_0",
+      allowNull: false,
+    },
   });
 
   function setUrls(instance) {

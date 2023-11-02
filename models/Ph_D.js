@@ -1,5 +1,5 @@
 module.exports = (db, DataTypes) => {
-  const PhD = db.define("Ph_D", {
+  const PhD = db.define("PhD", {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -30,21 +30,27 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    TwoRecommendationLetters:{
+    TwoRecommendationLetters: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    EnglishTestResults:{
+    EnglishTestResults: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    ExperienceLetter:{
+    ExperienceLetter: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    ResearchProposal:{ // this i want it as word file 
+    ResearchProposal: {
+      // this i want it as word file
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    currentStep:{
+      type: DataTypes.ENUM("step_0", "step_1", "step_2", "step_3", "step_4", "step_5"),
+      defaultValue: "step_0",
+      allowNull: false,
     },
   });
 
@@ -53,7 +59,10 @@ module.exports = (db, DataTypes) => {
       if (instance.CV && !instance.CV.startsWith(process.env.BASE_URL)) {
         instance.CV = `${process.env.BASE_URL}/PH_D/cv/${instance.CV}`;
       }
-      if (instance.EnglishTestResults && !instance.CV.startsWith(process.env.BASE_URL)) {
+      if (
+        instance.EnglishTestResults &&
+        !instance.EnglishTestResults.startsWith(process.env.BASE_URL)
+      ) {
         instance.EnglishTestResults = `${process.env.BASE_URL}/PH_D/EnglishTestResults/${instance.EnglishTestResults}`;
       }
       if (
@@ -71,6 +80,36 @@ module.exports = (db, DataTypes) => {
         )
       ) {
         instance.MastersDegreeCertificateWithTranscript = `${process.env.BASE_URL}/PH_D/MastersDegreeCertificateWithTranscript/${instance.MastersDegreeCertificateWithTranscript}`;
+      }
+      if (
+        instance.PersonalPicture &&
+        !instance.PersonalPicture.startsWith(process.env.BASE_URL)
+      ) {
+        instance.PersonalPicture = `${process.env.BASE_URL}/PH_D/PersonalPicture/${instance.PersonalPicture}`;
+      }
+      if (
+        instance.TwoRecommendationLetters &&
+        !instance.TwoRecommendationLetters.startsWith(process.env.BASE_URL)
+      ) {
+        instance.TwoRecommendationLetters = `${process.env.BASE_URL}/PH_D/TwoRecommendationLetters/${instance.TwoRecommendationLetters}`;
+      }
+      if (
+        instance.ExperienceLetter &&
+        !instance.ExperienceLetter.startsWith(process.env.BASE_URL)
+      ) {
+        instance.ExperienceLetter = `${process.env.BASE_URL}/PH_D/ExperienceLetter/${instance.ExperienceLetter}`;
+      }
+      if (
+        instance.PersonalStatement &&
+        !instance.PersonalStatement.startsWith(process.env.BASE_URL)
+      ) {
+        instance.PersonalStatement = `${process.env.BASE_URL}/PH_D/PersonalStatement/${instance.PersonalStatement}`;
+      }
+      if (
+        instance.ResearchProposal &&
+        !instance.ResearchProposal.startsWith(process.env.BASE_URL)
+      ) {
+        instance.ResearchProposal = `${process.env.BASE_URL}/PH_D/ResearchProposal/${instance.ResearchProposal}`;
       }
     }
   }

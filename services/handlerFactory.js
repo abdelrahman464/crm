@@ -48,7 +48,6 @@ exports.getOne = (Model) =>
 exports.getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
     const searchQuery = req.query.keyword; // Assuming the search term is passed in the 'q' query parameter
-    const {year} = req.query;
 
     let filter = {};
     if (searchQuery) {
@@ -65,11 +64,6 @@ exports.getAll = (Model, modelName) =>
         };
       }
     }
-    if (year) {
-      filter.createdAt = {
-        [Op.between]: [`${year}-01-01T00:00:00.000Z`, `${year}-12-31T23:59:59.999Z`],
-      };
-    }
     const documents = await Model.findAll({ where: filter });
     res.status(200).json({ data: documents });
   });
@@ -84,4 +78,74 @@ exports.deleteOne = (Model) =>
     }
 
     res.status(204).send();
+  });
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+exports.sendRequest = (Model, ModelName) =>
+  asyncHandler(async (req, res) => {
+    let obj = {};
+    if (ModelName === "Bachelor") {
+      obj = {
+        PersonalPicture: req.body.PersonalPicture,
+        HighSchoolCertificate: req.body.HighSchoolCertificate,
+        CV: req.body.CV,
+        PersonalStatement: req.body.PersonalStatement,
+      };
+    }
+    if (ModelName === "Master") {
+      obj = {
+        PersonalPicture: req.body.PersonalPicture,
+        CV: req.body.CV,
+        HighSchoolCertificate: req.body.HighSchoolCertificate,
+        BachelorsDegreeCertificateWithTranscript:
+          req.body.BachelorsDegreeCertificateWithTranscript,
+        EnglishTestResults: req.body.EnglishTestResults,
+        TwoRecommendationLetters: req.body.TwoRecommendationLetters,
+        ExperienceLetter: req.body.ExperienceLetter,
+        PersonalStatement: req.body.PersonalStatement,
+        ResearchProposal: req.body.ResearchProposal,
+      };
+    }
+    if (ModelName === "PHD") {
+      obj = {
+        PersonalPicture: req.body.PersonalPicture,
+        CV: req.body.CV,
+        BachelorsDegreeCertificateWithTranscript:
+          req.body.BachelorsDegreeCertificateWithTranscript,
+        MastersDegreeCertificateWithTranscript:
+          req.body.MastersDegreeCertificateWithTranscript,
+        EnglishTestResults: req.body.EnglishTestResults,
+        TwoRecommendationLetters: req.body.TwoRecommendationLetters,
+        ExperienceLetter: req.body.ExperienceLetter,
+        PersonalStatement: req.body.PersonalStatement,
+        ResearchProposal: req.body.ResearchProposal,
+      };
+    }
+    const newRequest = await Model.create(obj);
+
+    // Respond with a success message or the new request object
+    return res
+      .status(200)
+      .json({ message: "Request sent successfully", request: newRequest });
+  });
+
+// update the request eligiblilty by admin
+exports.updateRequest = (Model) =>
+  asyncHandler(async (req, res, next) => {
+    const requestId = req.params.id;
+    const { Eligibility } = req.body;
+    // Find the request by ID in the database
+    const request = await Model.findByPk(requestId);
+
+    // Check if the request exists
+    if (!request) {
+      return next(new ApiError(`Request not found`, 404));
+    }
+    // Update the Eligibility of the request
+    request.Eligibility = Eligibility;
+    await request.save();
+    // Respond with a success message or the updated request
+    res
+      .status(200)
+      .json({ message: "Request status updated successfully", request });
   });
