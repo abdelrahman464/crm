@@ -32,11 +32,9 @@ Master.belongsTo(User);
 User.hasMany(PHD, { as: "PHD" });
 PHD.belongsTo(User);
 
-
-
 //generate tables in DB
 db.sync({ force: false }).then(() => {
   console.log("Tables Created");
 });
 
-module.exports = { User, Request };
+module.exports = { User, Bachelor, Master, PHD };
