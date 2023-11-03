@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const { PhD } = require("../models");
 const ApiError = require("../utils/apiError");
-const { sendRequest,updateRequest, getOne, getAll, deleteOne } = require("./handlerFactory");
+const { sendRequest,updateRequestEligibility, getOne, getAll, deleteOne } = require("./handlerFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
 exports.uploads = uploadMixOfImages([
@@ -167,7 +167,7 @@ exports.sendBachelorRequest = sendRequest(PhD,"PhD");
 exports.getPhDById = getOne(PhD);
 
 // update request (eligible or not eligible)
-exports.updatePhDRequest = updateRequest(PhD);
+exports.updatePhDRequest = updateRequestEligibility(PhD);
 // Get All PhD
 exports.getAllPhDs = getAll(PhD, "PhD");
 

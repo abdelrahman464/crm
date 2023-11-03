@@ -5,7 +5,7 @@ const { Master } = require("../models");
 const ApiError = require("../utils/apiError");
 const {
   sendRequest,
-  updateRequest,
+  updateRequestEligibility,
   getOne,
   getAll,
   deleteOne,
@@ -171,7 +171,7 @@ exports.sendBachelorRequest = sendRequest(Master, "Master");
 exports.getMasterById = getOne(Master);
 
 // update request (eligible or not eligible)
-exports.updateMasterRequest = updateRequest(Master);
+exports.updateMasterRequest = updateRequestEligibility(Master);
 
 // Get All Bachelors
 exports.getAllMasters = getAll(Master, "Master");

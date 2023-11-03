@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const { Op } = require("sequelize");
+const { Master, Bachelor, PhD } = require("../models");
 const ApiError = require("../utils/apiError");
 
 exports.updateOne = (Model) =>
@@ -130,7 +131,7 @@ exports.sendRequest = (Model, ModelName) =>
   });
 
 // update the request eligiblilty by admin
-exports.updateRequest = (Model) =>
+exports.updateRequestEligibility = (Model) =>
   asyncHandler(async (req, res, next) => {
     const requestId = req.params.id;
     const { Eligibility } = req.body;
@@ -149,3 +150,57 @@ exports.updateRequest = (Model) =>
       .status(200)
       .json({ message: "Request status updated successfully", request });
   });
+
+exports.canSendRequest = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id; // Assuming userId is part of the request body
+
+  const masterRequests = await Master.findAll({
+    where: {
+      UserId: userId,
+      Eligibility: "pending",
+    },
+  });
+  // Check if there are pending requests in the Master table
+  if (masterRequests.length > 0) {
+    return next(
+      new ApiError(
+        `You can only send a new request after the previous request is proccessed`,
+        400
+      )
+    );
+  }
+  const bachelorRequests = await Bachelor.findAll({
+    where: {
+      UserId: userId,
+      Eligibility: "pending",
+    },
+  });
+
+  // Check if there are pending requests in the Bachelor table
+  if (bachelorRequests.length > 0) {
+    return next(
+      new ApiError(
+        `You can only send a new request after the previous request is proccessed`,
+        400
+      )
+    );
+  }
+
+  const phdRequests = await PhD.findAll({
+    where: {
+      UserId: userId,
+      Eligibility: "pending",
+    },
+  });
+  // Check if there are pending requests in the PhD table
+  if (phdRequests.length > 0) {
+    return next(
+      new ApiError(
+        `You can only send a new request after the previous request is proccessed`,
+        400
+      )
+    );
+  }
+
+  next();
+});
