@@ -1,0 +1,67 @@
+  CRM project 
+tables:
+ 
+1-employees :
+	data	
+
+2-applicant :                                         
+	Student Name: String
+	Mobile: 
+	Passport:   pdf
+	Required specialization: 
+	Country of study:
+	type: Bachelor
+	employee_id
+
+3-Bachelor:
+	user_id:
+	Personal Picture white background:image
+	High School certificate:
+	English test results: (if any)
+	CV :    (UK)
+	Personal statement  (UK)
+	Eligibility:  pending/Eligible/Not_Eligible
+
+4-Master:
+	user_id
+	Personal Picture white background	All
+	High School certificate:  		All
+	Bachelor’s degree certificate with transcript:		All
+	Two recommendation letters			All
+	English test results (if any)			All
+	CV						UK
+	Experience letter		 	Malaysia and UK
+	Personal statement				UK
+	Research Proposal (if research based)	Malaysia and UK
+	Eligibility: pending/Eligible/Not_Eligible
+
+
+5-Ph.D:	
+	user_id 
+	Personal Picture white background			All
+	Bachelor’s degree certificate with transcript	     Malaysia
+	Master’s degree certificate with transcript 		All
+	Two recommendation letters				All
+	English test results (if any)				All
+	CV							UK
+	Experience letter 				Malaysia and UK
+	Personal statement					UK
+	Research Proposal 					All
+	Eligibility:  pending/Eligible/Not_Eligible
+
+
+		
+TODO:	
+	-create tables    [contractFees , visaFees , registrationFees]        (user_id , amount , date , ....)
+		relation : one to one  
+
+	-create realtion of [user_docs]        --> (user_id , docs ,.....)     
+		relation : one to one 
+		-add pre middlewares for storing pdfs 
+    
+	-create CRUD for Employee (admin)
+	
+
+
+
+
