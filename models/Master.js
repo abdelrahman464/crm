@@ -5,14 +5,26 @@ module.exports = (db, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    Eligibility: {
-      type: DataTypes.ENUM("eligible", "notEligible", "pending"),
-      defaultValue: "pending",
-      allowNull: false,
+    Passport: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    RequiredSpecialization: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     PersonalPicture: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    CountryOfStudy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    Eligibility: {
+      type: DataTypes.ENUM("eligible", "notEligible", "pending"),
+      defaultValue: "pending",
+      allowNull: false,
     },
     HighSchoolCertificate: {
       type: DataTypes.STRING,
@@ -46,15 +58,34 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    currentStep:{
-      type: DataTypes.ENUM("step_0", "step_1", "step_2", "step_3", "step_4", "step_5"),
-      defaultValue: "step_0",
-      allowNull: false,
+    currentStep: {
+      type: DataTypes.ENUM(
+        "sign_contract", //1-make fuction for user to upload his signed Contract  //2-make one for employee to check and move him
+        "contract_fees", //3- with webhook  he automatically go to next step
+        "sending_offerLetter", //4-make function for employee to update this status when offer letter comes
+        "deliver_and_sign_offerLetter", //5-make fuction for user to upload his signed offerLetter  //6-make one for employee to check and move him
+        "get_copy_of_mohere", //7-make fuction for user to upload his MOHERE    //8-make one for employee to check and move him
+        "visa_fees", //9- with webhook  he automatically go to next step
+        "getting_EMGS_approval", //10- make function for employee to update it to next step
+        "registration_fees", //11- with webhook  he automatically go to next step
+        "getting_final_acceptance_letter", // 12-make function for employee to update it to next step
+        "recieving_ticket_copy", //13-make fuction for user to upload his ticket  //14-make one for employee to check and move him
+        "applying_for_visa", //14-make one for employee to check and move him and pickup airport ticket or something
+        "arranging_airport_pickup" //thack you
+      ),
+      defaultValue: "sign_contract",
+      allowNull: true,
     },
   });
 
   function setUrls(instance) {
     if (instance) {
+      if (
+        instance.Passport &&
+        !instance.Passport.startsWith(process.env.BASE_URL)
+      ) {
+        instance.Passport = `${process.env.BASE_URL}/PH_D/passport/${instance.Passport}`;
+      }
       if (
         instance.PersonalPicture &&
         !instance.PersonalPicture.startsWith(process.env.BASE_URL)

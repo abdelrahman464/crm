@@ -59,18 +59,7 @@ module.exports = (db, DataTypes) => {
       allowNull: false,
       defaultValue: "user",
     },
-    Passport: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    RequiredSpecialization: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    CountryOfStudy: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+ 
     type: {
       type: DataTypes.ENUM("Bachelor","Master", "Ph_D"),
       allowNull: false,
@@ -103,7 +92,7 @@ module.exports = (db, DataTypes) => {
       });
     } else {
       setUrls(instances);
-    }
+    } 
   });
   
   // Hook to set the image and PDF URLs after creating a new record
