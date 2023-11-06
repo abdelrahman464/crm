@@ -1,34 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
-const { v4: uuidv4 } = require("uuid");
-const fs = require("fs");
 const ApiError = require("../utils/apiError");
 const generateToken = require("../utils/generateToken");
 const { User } = require("../models");
 const { createOne, getOne, getAll, deleteOne } = require("./handlerFactory");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
-
-exports.uploads = uploadSingleImage("passport");
-
-// Processing middleware for resizing and saving BankAccountFile
-exports.resize = asyncHandler(async (req, res, next) => {
-  if (req.file) {
-    const pdfFile = req.file.passport;
-    if (!pdfFile) {
-      // Handle the case where no 'passport' file is found
-      return next(new Error("Passport file not found"));
-    }
-    if (pdfFile.mimetype === "application/pdf") {
-      const pdfFileName = `passport-pdf-${uuidv4()}-${Date.now()}.pdf`;
-      const pdfPath = `uploads/passport/${pdfFileName}`;
-      fs.writeFileSync(pdfPath, pdfFile[0].buffer);
-      req.body.passport = pdfFileName;
-    } else {
-      return next(new ApiError("Invalid passport file format", 400));
-    }
-  }
-  next();
-});
 
 //@desc update specific user
 //@route PUT /api/v1/user/:id

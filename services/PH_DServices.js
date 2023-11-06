@@ -3,7 +3,13 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const { PhD } = require("../models");
 const ApiError = require("../utils/apiError");
-const { sendRequest,updateRequestEligibility, getOne, getAll, deleteOne } = require("./handlerFactory");
+const {
+  sendRequest,
+  updateRequestEligibility,
+  getOne,
+  getAll,
+  deleteOne,
+} = require("./handlerFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
 exports.uploads = uploadMixOfImages([
@@ -43,10 +49,25 @@ exports.uploads = uploadMixOfImages([
     name: "ResearchProposal",
     maxCount: 1,
   },
+  {
+    name: "Passport",
+    maxCount: 1,
+  },
 ]);
 
 // Processing middleware for resizing and saving BankAccountFile
 exports.resize = asyncHandler(async (req, res, next) => {
+  if (req.files.Passport) {
+    const pdfFile = req.files.Passport[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `Passport-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/Ph_D/Passport/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.Passport = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid Passport file format", 400));
+    }
+  }
   if (req.files.PersonalPicture) {
     const pdfFile = req.files.PersonalPicture[0];
     if (pdfFile.mimetype === "application/pdf") {
@@ -162,7 +183,7 @@ exports.resize = asyncHandler(async (req, res, next) => {
 });
 
 // send PhD Request
-exports.sendBachelorRequest = sendRequest(PhD,"PhD");
+exports.sendBPhdRequest = sendRequest(PhD, "PhD");
 // Get One PhD
 exports.getPhDById = getOne(PhD);
 

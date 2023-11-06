@@ -21,6 +21,10 @@ exports.uploads = uploadMixOfImages([
     name: "HighSchoolCertificate",
     maxCount: 1,
   },
+  {
+    name: "Passport",
+    maxCount: 1,
+  },
 ]);
 
 // Processing middleware for resizing and saving BankAccountFile
@@ -46,6 +50,19 @@ exports.resize = asyncHandler(async (req, res, next) => {
     } else {
       return next(
         new ApiError("Invalid HighSchoolCertificate file format", 400)
+      );
+    }
+  }
+  if (req.files.Passport) {
+    const pdfFile = req.files.Passport[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `Passport-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/Bachelor/Passport/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.Passport = pdfFileName;
+    } else {
+      return next(
+        new ApiError("Invalid Passport file format", 400)
       );
     }
   }
