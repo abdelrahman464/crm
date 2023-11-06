@@ -1,7 +1,7 @@
 const express = require("express");
 
 const { protect, allowedTo } = require("../services/authServices");
-const { canSendRequest } = require("../services/handlerFactory");
+const { canSendRequest,filterRequests } = require("../services/handlerFactory");
 const {
   getAllMasters,
   getMasterById,
@@ -14,7 +14,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(protect, getAllMasters)
+  .get(protect,filterRequests,getAllMasters)
   .post(protect, allowedTo("user"), canSendRequest, sendMasterRequest);
 router
   .route("/:id")
@@ -24,6 +24,6 @@ router
     allowedTo("admin", "user"), // we need validation to user that make the request who get it
     getMasterById
   )
-  .put(protect, allowedTo("admin", "user"), updateMasterRequest);
+  .put(protect, allowedTo("admin","employee"), updateMasterRequest);
 
 module.exports = router;

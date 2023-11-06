@@ -14,7 +14,7 @@ const {
   updateLoggedUserData,
   updateLoggedUserPassword,
   getLoggedUserData,
-  uploads,resize
+ 
 } = require("../services/userServices");
 const authServices = require("../services/authServices");
 
@@ -40,7 +40,6 @@ router
   .post(
     authServices.protect,
     authServices.allowedTo("admin"),
-    uploads,resize,
     createUserValidator,
     createUser
   );
@@ -49,7 +48,6 @@ router
   .put(
     authServices.protect,
     authServices.allowedTo("admin"),
-    uploads,resize,
     updateUserValidator,
     updateUser
   )

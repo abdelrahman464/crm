@@ -37,15 +37,17 @@ User.hasMany(PHD, { as: "PHD" });
 PHD.belongsTo(User);
 
 
-//Employee & Bachelor => relationships (one to many)
-Employee.hasMany(Bachelor, { as: "Bachelor" });
-Bachelor.belongsTo(Employee);
-//Employee & Master => relationships (one to many)
-Employee.hasMany(Master, { as: "Master" });
-Master.belongsTo(Employee);
-//Employee & PHD => relationships (one to many)
-Employee.hasMany(PHD, { as: "PHD" });
-PHD.belongsTo(Employee);
+User.hasMany(Bachelor, { as: 'ManageBachelors', foreignKey: 'employeeId' });
+Bachelor.belongsTo(User, { as: 'Employee', foreignKey: 'employeeId' });
+
+
+User.hasMany(Master, { as: 'ManageMasters', foreignKey: 'employeeId' });
+Master.belongsTo(User, { as: 'Employee', foreignKey: 'employeeId' });
+
+
+User.hasMany(PHD, { as: 'ManagePHD', foreignKey: 'employeeId' });
+PHD.belongsTo(User, { as: 'Employee', foreignKey: 'employeeId' });
+
 
 //generate tables in DB
 db.sync({ force: false }).then(() => {

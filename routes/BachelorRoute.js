@@ -1,20 +1,21 @@
 const express = require("express");
 
 const { protect, allowedTo } = require("../services/authServices");
-const { canSendRequest } = require("../services/handlerFactory");
+const { canSendRequest,filterRequests } = require("../services/handlerFactory");
 const {
   getAllBachelors,
   getBachelorById,
   sendBachelorRequest,
   updateBachelorRequest,
   deleteBachelor,
+  
 } = require("../services/BachelorServices");
 
 const router = express.Router();
 
 router
   .route("/")
-  .get(protect, getAllBachelors)
+  .get(protect,filterRequests,getAllBachelors)
   .post(protect, allowedTo("user"), canSendRequest, sendBachelorRequest);
 router
   .route("/:id")
@@ -24,6 +25,6 @@ router
     allowedTo("admin", "user"), // we need validation to user that make the request who get it
     getBachelorById
   )
-  .put(protect, allowedTo("admin", "user"), updateBachelorRequest);
+  .put(protect, allowedTo("admin"), updateBachelorRequest);
 
 module.exports = router;

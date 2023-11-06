@@ -46,25 +46,29 @@ exports.getOne = (Model) =>
     res.status(200).json({ data: document });
   });
 
-exports.getAll = (Model, modelName) =>
+  exports.getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
-    const searchQuery = req.query.keyword; // Assuming the search term is passed in the 'q' query parameter
+    const searchQuery = req.query.keyword; // Assuming the search term is passed in the 'keyword' query parameter
 
-    let filter = {};
+    let filter = { ...req.filterObj }; // Copy the existing filter object
+
     if (searchQuery) {
+      let searchFilter;
       if (modelName === "User") {
-        filter = {
+        searchFilter = {
           [Op.or]: [{ username: { [Op.like]: `%${searchQuery}%` } }],
         };
       } else {
-        filter = {
+        searchFilter = {
           [Op.or]: [
-            { title: { [Op.like]: `%${searchQuery}%` } }, // Case-insensitive partial match on the 'name' field
+            { title: { [Op.like]: `%${searchQuery}%` } }, // Case-insensitive partial match on the 'title' field
             // Add more fields here if you want to search on additional fields
           ],
         };
       }
+      filter = { ...filter, ...searchFilter }; // Merge the existing filter with the search filter
     }
+
     const documents = await Model.findAll({ where: filter });
     res.status(200).json({ data: documents });
   });
@@ -211,4 +215,35 @@ exports.canSendRequest = asyncHandler(async (req, res, next) => {
     }
   }
   next();
+});
+
+exports.filterRequests = asyncHandler(async (req, res, next) => {
+  let filterObject = {};
+
+  if (req.user.role === "admin") {
+    
+    filterObject = {
+      order: [['updated_at', 'DESC']]
+    };
+  }
+  
+  if (req.user.role === "employee") {
+    
+    filterObject = {
+      employeeId:req.user.id,
+      order: [['updated_at', 'DESC']]
+      
+    };
+  }
+  
+  else if (req.user.role === "user") {
+    
+    filterObject = {
+      UserId:req.user.id,
+      order: [['updated_at', 'DESC']]
+    };
+  }
+  req.filterObj = filterObject;
+  next();
+
 });

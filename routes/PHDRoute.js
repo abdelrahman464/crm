@@ -1,7 +1,7 @@
 const express = require("express");
 
 const { protect, allowedTo } = require("../services/authServices");
-const { canSendRequest } = require("../services/handlerFactory");
+const { canSendRequest,filterRequests } = require("../services/handlerFactory");
 const {
   getAllPhDs,
   getPhDById,
@@ -14,7 +14,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(protect, getAllPhDs)
+  .get(protect,filterRequests,getAllPhDs)
   .post(protect, allowedTo("user"), canSendRequest, sendBPhdRequest);
 router
   .route("/:id")
@@ -24,6 +24,6 @@ router
     allowedTo("admin", "user"), // we need validation to user that make the request who get it
     getPhDById
   )
-  .put(protect, allowedTo("admin", "user"), updatePhDRequest);
+  .put(protect, allowedTo("admin"), updatePhDRequest);
 
 module.exports = router;
