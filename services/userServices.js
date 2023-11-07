@@ -11,23 +11,30 @@ const { createOne, getOne, getAll, deleteOne } = require("./handlerFactory");
 
 //needs to be updated
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(
-    req.params.id,
+  const userId = req.params.id;
+  const { username, email, role } = req.body;
+
+  const [updatedRows] = await User.update(
     {
-      username: req.body.username,
-      email: req.body.email,
-      image: req.body.image,
-      role: req.body.role,
+      username: username,
+      email: email,
+      role: role,
     },
     {
-      new: true,
+      where: { id: userId },
     }
   );
-  if (!user) {
-    return next(new ApiError(`User Not Found`, 404));
+
+  if (updatedRows === 0) {
+    return next(new ApiError("User Not Found", 404));
   }
 
-  res.status(200).json({ data: user });
+  // Fetch the updated user after the update
+  const updatedUser = await User.findOne({
+    where: { id: userId },
+  });
+
+  res.status(200).json({ data: updatedUser });
 });
 
 // Create One User
@@ -62,7 +69,7 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
   );
 
   if (affectedRowCount === 0) {
-    return ApiError("User Not Found", 404);
+    return next(new ApiError(`User Not Found`, 404));
   }
   //genrate token
   const token = generateToken(req.user.id);
@@ -73,20 +80,26 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 //@route PUT /api/v1/user/changeMyData
 //@access private/protect
 exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
-  const [updatedRows, [updatedUser]] = await User.update(
+  const { username, email } = req.body;
+
+  const [updatedRows] = await User.update(
     {
-      username: req.body.name,
-      email: req.body.email,
-      image: req.body.image,
+      username: username,
+      email: email,
     },
     {
       where: { id: req.user.id },
-      returning: true, // Get the updated user object in the response
     }
   );
 
   if (updatedRows === 0) {
-    return ApiError("User Not Found", 404);
+    return next(new ApiError("User Not Found", 404));
   }
+
+  // Fetch the updated user after the update
+  const updatedUser = await User.findOne({
+    where: { id: req.user.id },
+  });
+
   res.status(200).json({ data: updatedUser });
 });

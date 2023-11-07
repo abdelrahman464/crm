@@ -25,6 +25,14 @@ exports.uploads = uploadMixOfImages([
     name: "Passport",
     maxCount: 1,
   },
+  {
+    name: "PersonalPicture",
+    maxCount: 1,
+  },
+  {
+    name: "PersonalStatement",
+    maxCount: 1,
+  },
 ]);
 
 // Processing middleware for resizing and saving BankAccountFile
@@ -53,6 +61,17 @@ exports.resize = asyncHandler(async (req, res, next) => {
       );
     }
   }
+  if (req.files.PersonalPicture) {
+    const pdfFile = req.files.PersonalPicture[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `PersonalPicture-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/Bachelor/PersonalPicture/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.PersonalPicture = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid PersonalPicture file format", 400));
+    }
+  }
   if (req.files.Passport) {
     const pdfFile = req.files.Passport[0];
     if (pdfFile.mimetype === "application/pdf") {
@@ -61,9 +80,22 @@ exports.resize = asyncHandler(async (req, res, next) => {
       fs.writeFileSync(pdfPath, pdfFile.buffer);
       req.body.Passport = pdfFileName;
     } else {
-      return next(
-        new ApiError("Invalid Passport file format", 400)
-      );
+      return next(new ApiError("Invalid Passport file format", 400));
+    }
+  }
+  if (req.files.PersonalStatement) {
+    const wordFile = req.files.PersonalStatement[0];
+    if (
+      wordFile.mimetype === "application/msword" ||
+      wordFile.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      const wordFileName = `PersonalStatement-docx-${uuidv4()}-${Date.now()}.docx`;
+      const wordPath = `uploads/Bachelor/PersonalStatement/${wordFileName}`;
+      fs.writeFileSync(wordPath, wordFile.buffer);
+      req.body.PersonalStatement = wordFileName;
+    } else {
+      return next(new ApiError("Invalid Personal Statement file format", 400));
     }
   }
   next();

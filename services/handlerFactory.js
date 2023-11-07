@@ -46,11 +46,12 @@ exports.getOne = (Model) =>
     res.status(200).json({ data: document });
   });
 
-  exports.getAll = (Model, modelName) =>
+exports.getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
     const searchQuery = req.query.keyword; // Assuming the search term is passed in the 'keyword' query parameter
 
-    let filter = { ...req.filterObj }; // Copy the existing filter object
+    let filter = { ...req.filterObj };
+    console.log("Filter:", filter);
 
     if (searchQuery) {
       let searchFilter;
@@ -91,6 +92,8 @@ exports.sendRequest = (Model, ModelName) =>
     let obj = {};
     if (ModelName === "Bachelor") {
       obj = {
+        UserId: req.user.id,
+        Passport: req.body.Passport,
         PersonalPicture: req.body.PersonalPicture,
         HighSchoolCertificate: req.body.HighSchoolCertificate,
         CV: req.body.CV,
@@ -99,6 +102,8 @@ exports.sendRequest = (Model, ModelName) =>
     }
     if (ModelName === "Master") {
       obj = {
+        UserId: req.user.id,
+        Passport: req.body.Passport,
         PersonalPicture: req.body.PersonalPicture,
         CV: req.body.CV,
         HighSchoolCertificate: req.body.HighSchoolCertificate,
@@ -113,6 +118,8 @@ exports.sendRequest = (Model, ModelName) =>
     }
     if (ModelName === "PHD") {
       obj = {
+        UserId: req.user.id,
+        Passport: req.body.Passport,
         PersonalPicture: req.body.PersonalPicture,
         CV: req.body.CV,
         BachelorsDegreeCertificateWithTranscript:
@@ -221,29 +228,19 @@ exports.filterRequests = asyncHandler(async (req, res, next) => {
   let filterObject = {};
 
   if (req.user.role === "admin") {
-    
-    filterObject = {
-      order: [['updated_at', 'DESC']]
-    };
+    filterObject = {};
   }
-  
+
   if (req.user.role === "employee") {
-    
     filterObject = {
-      employeeId:req.user.id,
-      order: [['updated_at', 'DESC']]
-      
+      employeeId: req.user.id,
     };
-  }
-  
-  else if (req.user.role === "user") {
-    
+  } else if (req.user.role === "user") {
     filterObject = {
-      UserId:req.user.id,
-      order: [['updated_at', 'DESC']]
+      UserId: req.user.id,
     };
   }
   req.filterObj = filterObject;
+  console.log("filterObject:", filterObject); // Add this log statement
   next();
-
 });

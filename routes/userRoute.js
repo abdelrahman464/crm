@@ -14,7 +14,6 @@ const {
   updateLoggedUserData,
   updateLoggedUserPassword,
   getLoggedUserData,
- 
 } = require("../services/userServices");
 const authServices = require("../services/authServices");
 
@@ -23,8 +22,7 @@ router.get("/getMe", authServices.protect, getLoggedUserData, getUserById);
 router.put(
   "/changeMyPassword",
   authServices.protect,
-  authServices.allowedTo("admin"),
-
+  authServices.allowedTo("admin", "user"),
   changeLoggedUserPasswordValidator,
   updateLoggedUserPassword
 );

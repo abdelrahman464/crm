@@ -10,7 +10,14 @@ exports.createUserValidator = [
     .isLength({ min: 2 })
     .withMessage("too short User name")
     .isLength({ max: 100 })
-    .withMessage("too long User name"),
+    .withMessage("too long User name")
+    .custom((val) =>
+      User.findOne({ username: val }).then((user) => {
+        if (user.dataValues.username === val) {
+          return Promise.reject(new Error("username already in use"));
+        }
+      })
+    ),
   check("email")
     .notEmpty()
     .withMessage("Email required")
@@ -45,7 +52,19 @@ exports.createUserValidator = [
 ];
 exports.updateUserValidator = [
   check("id").isUUID().withMessage("Invalid id format"),
-  body("username").optional(),
+  body("username")
+    .optional()
+    .isLength({ min: 2 })
+    .withMessage("too short User name")
+    .isLength({ max: 100 })
+    .withMessage("too long User name")
+    .custom((val) =>
+      User.findOne({ username: val }).then((user) => {
+        if (user.dataValues.username === val) {
+          return Promise.reject(new Error("username already in use"));
+        }
+      })
+    ),
   check("email")
     .optional()
     .isEmail()
@@ -62,8 +81,19 @@ exports.updateUserValidator = [
   validatorMiddleware,
 ];
 exports.updateLoggedUserValidator = [
-  check("id").isUUID().withMessage("Invalid id format"),
-  body("username").optional(),
+  body("username")
+    .optional()
+    .isLength({ min: 2 })
+    .withMessage("too short User name")
+    .isLength({ max: 100 })
+    .withMessage("too long User name")
+    .custom((val) =>
+      User.findOne({ username: val }).then((user) => {
+        if (user.dataValues.username === val) {
+          return Promise.reject(new Error("username already in use"));
+        }
+      })
+    ),
   check("email")
     .optional()
     .isEmail()
@@ -79,7 +109,6 @@ exports.updateLoggedUserValidator = [
   validatorMiddleware,
 ];
 exports.changeLoggedUserPasswordValidator = [
-  check("id").isUUID().withMessage("Invalid id format"),
   body("currentPassword")
     .notEmpty()
     .withMessage("You must enter your current password"),

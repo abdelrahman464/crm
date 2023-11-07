@@ -3,14 +3,20 @@ const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 const { User } = require("../../models");
 
 exports.signupValidator = [
-  check("name")
+  check("username")
     .notEmpty()
     .withMessage("name required")
     .isLength({ min: 2 })
     .withMessage("too short User name")
     .isLength({ max: 100 })
     .withMessage("too long User name")
-    ,
+    .custom((val) =>
+      User.findOne({ username: val }).then((user) => {
+        if (user.dataValues.username === val) {
+          return Promise.reject(new Error("username already in use"));
+        }
+      })
+    ),
 
   check("email")
     .notEmpty()
@@ -19,7 +25,7 @@ exports.signupValidator = [
     .withMessage("Invalid email address")
     .custom((val) =>
       User.findOne({ email: val }).then((user) => {
-        if (user) {
+        if (user.dataValues.email === val) {
           return Promise.reject(new Error("E-mail already in use"));
         }
       })
@@ -39,18 +45,7 @@ exports.signupValidator = [
     }),
 
   check("passwordConfirm").notEmpty().withMessage("password required"),
-  check("phone")
-    .optional()
-    .isMobilePhone()
-    .withMessage("Invalid phone number"),
-  check("DataEntryPhone")
-    .optional()
-    .isMobilePhone()
-    .withMessage("Invalid phone number"),
-  check("CeoPhone")
-    .optional()
-    .isMobilePhone()
-    .withMessage("Invalid phone number"),
+
   validatorMiddleware,
 ];
 
@@ -70,7 +65,6 @@ exports.loginValidator = [
     .withMessage("password must be at least 8 characters"),
   validatorMiddleware,
 ];
-
 
 exports.verifyresetPasswordValidator = [
   check("resetCode").notEmpty().withMessage("ٌReset Code Is Required"),

@@ -12,33 +12,13 @@ const generateToken = require("../utils/generateToken");
 //@route POST /api/v1/auth/signup
 //@access public
 exports.signup = asyncHandler(async (req, res, next) => {
-  
   //1-create user
-  const newUser = await User.create(
-    {
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      entityName:req.body.entityName,
-      CeoName:req.body.CeoName,
-      CeoPhone:req.body.CeoPhone,
-      licensedEntity:req.body.licensedEntity,
-      DataEntryName : req.body.dataEntryName,
-      DataEntryPhone : req.body.dataEntryPhone,
-      EntityClassification : req.body.entityClassification,
-      Region : req.body.region,
-      licenseNumber: req.body.licenseNumber,
-      endOfLicense : req.body.endOfLicense,
-      licenseFile: req.body.licenseFile,
-      BankAccountFile: req.body.BankAccountFile,
-      phone: req.body.phone,
-      accountHolderName: req.body.accountHolder,
-      accountNumber: req.body.accountNumber,
-      PracticeLicenseFile:req.body.PracticeLicenseFile,
-      IBAN:req.body.IBAN,
-    }
-  );
-    
+  const newUser = await User.create({
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+  });
+
   // 2. Generate a verification code
   const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
   const hashedVerifyCode = crypto
@@ -67,12 +47,9 @@ exports.signup = asyncHandler(async (req, res, next) => {
       subject: "Your Verification code (valid for 10 min)",
       text: emailMessage,
     });
-    
-    
 
     res.status(201).json({ data: newUser, token });
   } catch (err) {
-    
     // await newUser.save();
     return next(
       new ApiError(
@@ -87,25 +64,29 @@ exports.signup = asyncHandler(async (req, res, next) => {
 //@access protected
 exports.generateVerifyCode = asyncHandler(async (req, res, next) => {
   const user = await User.findByPk(req.user.id);
-    if (!user) {
-      return next(new ApiError('User Not Found', 404));
-    }
-    if (user.emailVerified === true) {
-      return next(new ApiError('Email Already verified', 401));
-    }
-    
-    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashedVerifyCode = crypto.createHash('sha256').update(verifyCode).digest('hex');
+  console.log(user);
+  if (!user) {
+    return next(new ApiError("User Not Found", 404));
+  }
+  if (user.emailVerified === 1) {
+    return next(new ApiError("Email Already verified", 401));
+  }
 
-    user.emailVerifyCode = hashedVerifyCode;
-    user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000);
-    user.emailVerified = false;
+  const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedVerifyCode = crypto
+    .createHash("sha256")
+    .update(verifyCode)
+    .digest("hex");
 
-    await user.save();
+  user.emailVerifyCode = hashedVerifyCode;
+  user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000);
+  user.emailVerified = 0;
+
+  await user.save();
   //3-send the Verification code via email
 
   try {
-    const emailMessage = `Hi ${user.name}, 
+    const emailMessage = `Hi ${user.username}, 
                          \n ${verifyCode} 
                          \n enter this code to complete the verification 
                          \n thanks for helping us keep your account secure.
@@ -116,9 +97,9 @@ exports.generateVerifyCode = asyncHandler(async (req, res, next) => {
       text: emailMessage,
     });
   } catch (err) {
-    user.emailVerifyCode = undefined;
-    user.emailVerifyExpires = undefined;
-    user.emailVerified = undefined;
+    user.emailVerifyCode = null;
+    user.emailVerifyExpires = null;
+    user.emailVerified = null;
 
     await user.save();
     return next(
@@ -135,27 +116,28 @@ exports.generateVerifyCode = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/auth/verifyEmail
 //@access public
 exports.verifyEmail = asyncHandler(async (req, res, next) => {
-  const hashedVerifyCode = crypto.createHash('sha256').update(req.body.verifyCode).digest('hex');
-    const user = await User.findOne({
-      where: {
-        emailVerifyCode: hashedVerifyCode,
-        emailVerifyExpires: { [Op.gt]: Date.now() },
-      },
-    });
+  const hashedVerifyCode = crypto
+    .createHash("sha256")
+    .update(req.body.verifyCode)
+    .digest("hex");
+  const user = await User.findOne({
+    where: {
+      emailVerifyCode: hashedVerifyCode,
+      emailVerifyExpires: { [Op.gt]: Date.now() },
+    },
+  });
+  if (!user) {
+    return next(new ApiError("Verification code invalid or expired"));
+  }
+  user.emailVerified = 1;
+  user.emailVerifyCode = null;
+  user.emailVerifyExpires = null;
 
-    if (!user) {
-      return next(new ApiError('Verification code invalid or expired'));
-    }
-    console.log(user)
-    user.emailVerified = true;
-    user.emailVerifyCode = null;
-    user.emailVerifyExpires = null;
+  await user.save();
 
-    await user.save();
+  const token = generateToken(user.id);
 
-    const token = generateToken(user.id);
-
-    res.status(200).json({ data: user, token });
+  res.status(200).json({ data: user, token });
 });
 //@desc login
 //@route POST /api/v1/auth/login
@@ -177,7 +159,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 exports.protect = asyncHandler(async (req, res, next) => {
   //1- check if token exists, if exist get it
   let token;
-  
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -191,7 +173,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
   //3-check if user exists
   const currentUser = await User.findByPk(decoded.userId);
-  
+
   if (!currentUser) {
     next(new ApiError("user is not available"));
   }
@@ -251,7 +233,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   user.passwordResetCode = hashedResetCode;
   //add expiration time  for password reset code (10min)
   user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-  user.passwordResetVerified = false;
+  user.passwordResetVerified = 0;
 
   await user.save();
 
@@ -300,17 +282,17 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
       passwordResetCode: hashedResetCode,
       //check if the reset code is valid
       // if reset code expire date greater than Data.now() then reset code is valid
-
       passwordResetExpires: {
         [Op.gt]: new Date(),
       },
     },
   });
+
   if (!user) {
     return next(new ApiError("reset code invalid or expired"));
   }
   //2- reset code is valid
-  user.passwordResetVerified = true;
+  user.passwordResetVerified = 1;
   await user.save();
 
   res.status(200).json({ status: "success" });

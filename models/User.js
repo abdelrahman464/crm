@@ -75,34 +75,6 @@ module.exports = (db, DataTypes) => {
     user.password = await bcrypt.hash(user.password, 12);
   });
 
-  function setUrls(instance) {
-    if (instance.Passport) {
-      instance.Passport = `${process.env.BASE_URL}/passport/${instance.Passport}`;
-    }
-  }
-  
-  
-  
-  // Hook to set the image and PDF URLs after finding a record
-  User.afterFind((instances) => {
-    if (Array.isArray(instances)) {
-      instances.forEach((instance) => {
-        setUrls(instance);
-      });
-    } else {
-      setUrls(instances);
-    } 
-  });
-  
-  // Hook to set the image and PDF URLs after creating a new record
-  User.afterCreate((instance) => {
-    setUrls(instance);
-  });
-  
-  // Hook to set the image and PDF URLs after updating a record
-  User.afterUpdate((instance) => {
-    setUrls(instance);
-  });
   
   return User;
 };

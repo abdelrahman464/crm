@@ -1,6 +1,7 @@
 const express = require("express");
 
 const {
+  signupValidator,
   loginValidator,
   verifyresetPasswordValidator,
 } = require("../utils/validators/authValidator");
@@ -17,9 +18,9 @@ const {
 
 const router = express.Router();
 
-router.post("/signup", signup);
+router.post("/signup", signupValidator, signup);
 router.route("/verifyEmail").post(protect, verifyEmail);
-router.route("/sendVerifyCode").post(protect, generateVerifyCode);
+router.route("/sendVerifyCode").get(protect, generateVerifyCode);
 
 router.route("/login").post(loginValidator, login);
 

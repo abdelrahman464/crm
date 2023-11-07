@@ -14,16 +14,12 @@ const UserModel = require("./User");
 const BachelorModel = require("./Bachelor");
 const MasterModel = require("./Master");
 const PhDModel = require("./Ph_D");
-const EmployeeModel=require('./employee')
 
 //createa models
 const User = UserModel(db, Sequelize);
 const Bachelor = BachelorModel(db, Sequelize);
 const Master = MasterModel(db, Sequelize);
 const PHD = PhDModel(db, Sequelize);
-const Employee=EmployeeModel(db,Sequelize)
-
-
 
 //define relationships
 //User & Bachelor => relationships (one to many)
@@ -36,18 +32,14 @@ Master.belongsTo(User);
 User.hasMany(PHD, { as: "PHD" });
 PHD.belongsTo(User);
 
+User.hasMany(Bachelor, { as: "ManageBachelors", foreignKey: "employeeId" });
+Bachelor.belongsTo(User, { as: "Employee", foreignKey: "employeeId" });
 
-User.hasMany(Bachelor, { as: 'ManageBachelors', foreignKey: 'employeeId' });
-Bachelor.belongsTo(User, { as: 'Employee', foreignKey: 'employeeId' });
+User.hasMany(Master, { as: "ManageMasters", foreignKey: "employeeId" });
+Master.belongsTo(User, { as: "Employee", foreignKey: "employeeId" });
 
-
-User.hasMany(Master, { as: 'ManageMasters', foreignKey: 'employeeId' });
-Master.belongsTo(User, { as: 'Employee', foreignKey: 'employeeId' });
-
-
-User.hasMany(PHD, { as: 'ManagePHD', foreignKey: 'employeeId' });
-PHD.belongsTo(User, { as: 'Employee', foreignKey: 'employeeId' });
-
+User.hasMany(PHD, { as: "ManagePHD", foreignKey: "employeeId" });
+PHD.belongsTo(User, { as: "Employee", foreignKey: "employeeId" });
 
 //generate tables in DB
 db.sync({ force: false }).then(() => {
