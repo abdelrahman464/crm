@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const { Op } = require("sequelize");
-const { Master, Bachelor, PhD } = require("../models");
+const { Master, Bachelor, PhD, User } = require("../models");
 const ApiError = require("../utils/apiError");
 
 exports.updateOne = (Model) =>
@@ -134,7 +134,12 @@ exports.sendRequest = (Model, ModelName) =>
       };
     }
     const newRequest = await Model.create(obj);
-
+    await User.updateOne(
+      { type: "ModelName" },
+      {
+        where: { id: req.user.id },
+      }
+    );
     // Respond with a success message or the new request object
     return res
       .status(200)
