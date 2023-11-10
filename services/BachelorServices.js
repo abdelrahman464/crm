@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const { Bachelor } = require("../models");
+const { nextStep } = require("./progressServices");
 const ApiError = require("../utils/apiError");
 const {
   sendRequest,
@@ -116,3 +117,5 @@ exports.getAllBachelors = getAll(Bachelor, "Bachelor");
 
 // Delete One Bachelor
 exports.deleteBachelor = deleteOne(Bachelor);
+
+exports.goToNextStepAftersignContract = nextStep("Bachelor", "contract_fees");

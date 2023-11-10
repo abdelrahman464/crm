@@ -7,7 +7,7 @@ const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
 exports.uploads = uploadMixOfImages([
   {
-    name: "CV",
+    name: "signedConract",
     maxCount: 1,
   },
 ]);
