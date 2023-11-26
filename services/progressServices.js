@@ -19,7 +19,6 @@ exports.uploads = uploadMixOfImages([
     maxCount: 1,
   },
 ]);
-
 // Processing middleware for resizing and saving BankAccountFile
 exports.resize = asyncHandler(async (req, res, next) => {
   if (req.files.signedConract) {
@@ -36,7 +35,7 @@ exports.resize = asyncHandler(async (req, res, next) => {
 
   next();
 });
-
+//@actore  employee
 exports.nextStep = (requestName, stepName) =>
   asyncHandler(async (req, res, next) => {
     const requestId = req.params.id;
@@ -106,7 +105,7 @@ exports.uploadSignedContract = () =>
       }
       // realte the request with req_doc
       await Master.updateOne(
-        { requestDocId: RequestDoc },
+        { requestDocId: RequestDoc.id },
         {
           where: { id: masterRequests.id },
         }
@@ -196,6 +195,9 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
     customer_email: req.user.email,
 
     client_reference_id: requestId,
+    metadata: {
+      feesType: req.body.feesType,
+    },
   });
 
   //3) send session to response
@@ -204,12 +206,15 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
 const createOrderPayFees = async (session) => {
   const requestId = session.client_reference_id;
   const orderPrice = session.amount_total / 100;
+  //type = metadata visa /contract
+  const { feesType } = session.metadata;
   const user = await User.findOne({ email: session.customer_email });
   const request = user.type;
 
   const order = await Order.create({
-    user: user.id,
+    UserId: user.id,
     requstId: requestId,
+    type: feesType,
     totalOrderPrice: orderPrice,
     isPaid: 1,
     paidAt: Date.now(),

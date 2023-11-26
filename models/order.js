@@ -14,8 +14,8 @@ module.exports = (db, DataTypes) => {
       allowNull: true,
     },
     type: {
-      type: DataTypes.ENUM("contract_fees", "visa_fees"),
-      defaultValue: "contract_fees",
+      type: DataTypes.ENUM("contract_fees", "visa_fees","registration_fees"),
+      defaultValue: "unnknown",
       allowNull: false,
     },
     totalOrderPrice: {

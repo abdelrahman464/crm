@@ -74,6 +74,12 @@ registrationTransaction:
 
 
 
+what is new ??
+1-add new field called additionalServices 
+1-make function called craeteInvoice 	
+2-make one to get this invoice <--> when user try to pay 
+
+
 
 
 

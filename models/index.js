@@ -70,6 +70,9 @@ Master.belongsTo(RequestDoc, { as: "RequestDoc", foreignKey: "requestDocId" });
 RequestDoc.hasOne(PHD, { as: "PHDInfo", foreignKey: "requestDocId" });
 PHD.belongsTo(RequestDoc, { as: "RequestDoc", foreignKey: "requestDocId" });
 
+//for user and order
+User.hasMany(Order, { as: "userOrders", foreignKey: "UserId" });
+Order.belongsTo(User, { as: "userOrders", foreignKey: "UserId" });
 // ... (the rest of your code)
 
 //generate tables in DB
