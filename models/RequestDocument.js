@@ -5,15 +5,16 @@ module.exports = (db, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    conract: {
+    contract: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    signedConract: {
+    signedContract: {
       type: DataTypes.STRING,
       allowNull: true,
     },
     offerLetter: {
+      //employee
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -22,6 +23,11 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    // MOHERE: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    //   unique: true,
+    // },
     MOHEREApproval: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -33,10 +39,28 @@ module.exports = (db, DataTypes) => {
     if (instance) {
       // Check if the URL is already set before modifying it
       if (
-        instance.signedConract &&
-        !instance.signedConract.startsWith(process.env.BASE_URL)
+        instance.contract &&
+        !instance.contract.startsWith(process.env.BASE_URL)
       ) {
-        instance.signedConract = `${process.env.BASE_URL}/RequestDocument/signedConract/${instance.signedConract}`;
+        instance.contract = `${process.env.BASE_URL}/RequestDocument/contract/${instance.contract}`;
+      }
+      if (
+        instance.signedContract &&
+        !instance.signedContract.startsWith(process.env.BASE_URL)
+      ) {
+        instance.signedContract = `${process.env.BASE_URL}/RequestDocument/signedContract/${instance.signedContract}`;
+      }
+      if (
+        instance.offerLetter &&
+        !instance.offerLetter.startsWith(process.env.BASE_URL)
+      ) {
+        instance.offerLetter = `${process.env.BASE_URL}/RequestDocument/offerLetter/${instance.offerLetter}`;
+      }
+      if (
+        instance.signedOfferLetter &&
+        !instance.signedOfferLetter.startsWith(process.env.BASE_URL)
+      ) {
+        instance.signedOfferLetter = `${process.env.BASE_URL}/RequestDocument/signedOfferLetter/${instance.signedOfferLetter}`;
       }
     }
   }

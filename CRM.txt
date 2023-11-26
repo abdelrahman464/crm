@@ -76,14 +76,18 @@ registrationTransaction:
 
 what is new ??
 1-add new field called additionalServices 
-1-make function called craeteInvoice 	
-2-make one to get this invoice <--> when user try to pay 
+2-make function called craeteInvoice 	
+3-make one to get this invoice <--> when user try to pay 
+
+
+
+
+ 
 
 
 
 
 
-
-
-
-
+QU
+getting_EMGS_approval  : doc ?
+contract is const or variable 

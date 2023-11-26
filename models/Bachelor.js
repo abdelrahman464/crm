@@ -56,6 +56,7 @@ module.exports = (db, DataTypes) => {
       defaultValue: "sign_contract",
       allowNull: true,
     },
+
   });
 
   function setUrls(instance) {

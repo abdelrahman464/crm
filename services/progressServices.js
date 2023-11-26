@@ -9,27 +9,73 @@ const {
   RequestDocument,
   User,
   Order,
+  RequestDoc,
 } = require("../models");
 const ApiError = require("../utils/apiError");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
 exports.uploads = uploadMixOfImages([
   {
-    name: "signedConract",
+    name: "contract",
+    maxCount: 1,
+  },
+  {
+    name: "signedContract",
+    maxCount: 1,
+  },
+  {
+    name: "offerLetter",
+    maxCount: 1,
+  },
+  {
+    name: "signedOfferLetter",
     maxCount: 1,
   },
 ]);
 // Processing middleware for resizing and saving BankAccountFile
 exports.resize = asyncHandler(async (req, res, next) => {
-  if (req.files.signedConract) {
-    const pdfFile = req.files.signedConract[0];
+  if (req.files.contract) {
+    const pdfFile = req.files.contract[0];
     if (pdfFile.mimetype === "application/pdf") {
-      const pdfFileName = `signedConract-pdf-${uuidv4()}-${Date.now()}.pdf`;
-      const pdfPath = `uploads/RequestDocument/signedConract/${pdfFileName}`;
+      const pdfFileName = `contract-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/contract/${pdfFileName}`;
       fs.writeFileSync(pdfPath, pdfFile.buffer);
-      req.body.signedConract = pdfFileName;
+      req.body.contract = pdfFileName;
     } else {
-      return next(new ApiError("Invalid signed Conract file format", 400));
+      return next(new ApiError("Invalid Contract file format", 400));
+    }
+  }
+  if (req.files.signedContract) {
+    const pdfFile = req.files.signedContract[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `signedContract-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/signedContract/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.signedContract = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid signedContract file format", 400));
+    }
+  }
+  if (req.files.offerLetter) {
+    const pdfFile = req.files.offerLetter[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `offerLetter-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/offerLetter/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.offerLetter = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid offerLetter file format", 400));
+    }
+  }
+  if (req.files.signedOfferLetter) {
+    const pdfFile = req.files.signedOfferLetter[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `signedOfferLetter-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/signedOfferLetter/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.signedOfferLetter = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid signedOfferLetter file format", 400));
     }
   }
 
@@ -79,79 +125,122 @@ exports.nextStep = (requestName, stepName) =>
     res.status(200).json({ msg: "requst updated successfully" });
   });
 
-//  upload signed Contract this if first step
-exports.uploadSignedContract = () =>
+//upload Contract this if first step
+//@role : employee
+exports.uploadContract = () =>
   asyncHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const request = req.user.type;
+    const { requestId, requestType } = req.params;
 
-    if (request === null) {
+    if (requestType === null) {
       return next(new ApiError(`there is no request for this user`, 404));
     }
 
-    if (request === "Master") {
-      const RequestDoc = await RequestDocument.create({
-        signedConract: req.body.signedConract,
-      });
+    const requestDocument = await RequestDoc.create({
+      conract: req.body.conract,
+    });
 
-      const masterRequests = await Master.findOne({
-        where: {
-          UserId: userId,
-        },
-      });
-      // Check if there requests in the Master table for this user
-      if (masterRequests.length > 0) {
-        return next(new ApiError(`there is no request for this user`, 404));
-      }
+    //-------------------- !! START CREATION AND ASSIGNMENT !!   --------------------------
+    if (requestType === "Master") {
       // realte the request with req_doc
       await Master.updateOne(
-        { requestDocId: RequestDoc.id },
+        { requestDocId: requestDocument.id },
         {
-          where: { id: masterRequests.id },
+          where: { id: requestId },
         }
       );
     }
-    if (request === "Bachelor") {
-      const RequestDoc = await RequestDocument.create({
-        signedConract: req.body.signedConract,
-      });
-
-      const BachelorRequests = await Bachelor.findOne({
-        where: {
-          UserId: userId,
-        },
-      });
-      // Check if there requests in the Master table for this user
-      if (BachelorRequests.length > 0) {
-        return next(new ApiError(`there is no request for this user`, 404));
-      }
+    //---------------   !  ELSE !    --------------------
+    if (requestType === "Bachelor") {
       // realte the request with req_doc
       await Bachelor.updateOne(
-        { requestDocId: RequestDoc },
+        { requestDocId: requestDocument.id },
         {
-          where: { id: BachelorRequests.id },
+          where: { id: requestId },
         }
       );
     }
-    if (request === "PhD") {
-      const RequestDoc = await RequestDocument.create({
-        signedConract: req.body.signedConract,
-      });
+    //---------------   !  ELSE !    --------------------
+    if (requestType === "PhD") {
+      // realte the request with req_doc
+      await PhD.updateOne(
+        { requestDocId: requestDocument.id },
+        {
+          where: { id: requestId },
+        }
+      );
+    }
 
-      const PhDRequests = await PhD.findOne({
+    return res
+      .status(200)
+      .json({ message: "signed Contract uploaded successfuly" });
+  });
+
+//  upload signed Contract this if first step
+//@ role : user
+exports.uploadSignedContract = () =>
+  asyncHandler(async (req, res, next) => {
+    const { requestId } = req.params;
+    const requestType = req.user.type;
+    const { offerLetter } = req.body;
+
+    //if null
+
+    if (requestType === "Master") {
+      const request = await Master.findOne({
         where: {
-          UserId: userId,
+          id: requestId,
         },
       });
       // Check if there requests in the Master table for this user
-      if (PhDRequests.length > 0) {
+      if (request.length > 0) {
         return next(new ApiError(`there is no request for this user`, 404));
       }
-      // realte the request with req_doc
-      await PhD.updateOne(
-        { requestDocId: RequestDoc },
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { offerLetter: offerLetter },
         {
-          where: { id: PhDRequests.id },
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------       ELSE     -------------------------------------
+    if (requestType === "Bachelor") {
+      const request = await Bachelor.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(
+          new ApiError(`there is Bachelor request for this user`, 404)
+        );
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { offerLetter: offerLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------    !!  ELSE  !!  -------------------------------------
+
+    if (requestType === "PhD") {
+      const request = await PhD.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is PhD request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { offerLetter: offerLetter },
+        {
+          where: { id: request.requestDocId },
         }
       );
     }
@@ -170,6 +259,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
   const request = req.user.type;
   let feesPrrice;
   if (request === "Bachelor") {
+    //select object   --> get price
     feesPrrice = process.env.BachelorFeesPrices;
   } else if (request === "Master") {
     feesPrrice = process.env.MasterFeesPrices;
@@ -261,3 +351,77 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ received: true });
 });
+
+//  upload signed Contract this if first step
+//@role : employee
+exports.uploadOfferLetter = () =>
+  asyncHandler(async (req, res, next) => {
+    const { requestId, requestType } = req.params;
+
+    //get request
+
+    //upload offer letter , create object
+
+    if (requestType === "Master") {
+      const request = await Master.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is no request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDocument.updateOne(
+        { offerLetter: req.body.offerLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //------------------------
+    if (requestType === "Bachelor") {
+      const request = await Bachelor.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(
+          new ApiError(`there is Bachelor request for this user`, 404)
+        );
+      }
+      // updated the row of the request
+      await RequestDocument.updateOne(
+        { offerLetter: req.body.offerLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------
+    if (requestType === "PhD") {
+      const request = await PhD.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is PhD request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDocument.updateOne(
+        { offerLetter: req.body.offerLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ message: "signed Contract uploaded successfuly" });
+  });
