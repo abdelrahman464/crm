@@ -23,11 +23,11 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    // MOHERE: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    //   unique: true,
-    // },
+    MOHERE: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
     MOHEREApproval: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -61,6 +61,12 @@ module.exports = (db, DataTypes) => {
         !instance.signedOfferLetter.startsWith(process.env.BASE_URL)
       ) {
         instance.signedOfferLetter = `${process.env.BASE_URL}/RequestDocument/signedOfferLetter/${instance.signedOfferLetter}`;
+      }
+      if (
+        instance.MOHERE &&
+        !instance.MOHERE.startsWith(process.env.BASE_URL)
+      ) {
+        instance.MOHERE = `${process.env.BASE_URL}/RequestDocument/MOHERE/${instance.MOHERE}`;
       }
     }
   }

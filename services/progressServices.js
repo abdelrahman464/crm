@@ -2,15 +2,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
-const {
-  Master,
-  Bachelor,
-  PhD,
-  RequestDocument,
-  User,
-  Order,
-  RequestDoc,
-} = require("../models");
+const { Master, Bachelor, PhD, User, Order, RequestDoc } = require("../models");
 const ApiError = require("../utils/apiError");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
@@ -29,6 +21,10 @@ exports.uploads = uploadMixOfImages([
   },
   {
     name: "signedOfferLetter",
+    maxCount: 1,
+  },
+  {
+    name: "MOHERE",
     maxCount: 1,
   },
 ]);
@@ -78,6 +74,17 @@ exports.resize = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Invalid signedOfferLetter file format", 400));
     }
   }
+  if (req.files.MOHERE) {
+    const pdfFile = req.files.MOHERE[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `MOHERE-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/MOHERE/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.MOHERE = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid MOHERE file format", 400));
+    }
+  }
 
   next();
 });
@@ -124,7 +131,7 @@ exports.nextStep = (requestName, stepName) =>
 
     res.status(200).json({ msg: "requst updated successfully" });
   });
-
+//---------------------------------------------------------------------------------- start step 1 *****************************************************
 //upload Contract this if first step
 //@role : employee
 exports.uploadContract = () =>
@@ -135,7 +142,7 @@ exports.uploadContract = () =>
       return next(new ApiError(`there is no request for this user`, 404));
     }
 
-    const requestDocument = await RequestDoc.create({
+    const newrequestDocument = await RequestDoc.create({
       conract: req.body.conract,
     });
 
@@ -143,7 +150,7 @@ exports.uploadContract = () =>
     if (requestType === "Master") {
       // realte the request with req_doc
       await Master.updateOne(
-        { requestDocId: requestDocument.id },
+        { requestDocId: newrequestDocument.id },
         {
           where: { id: requestId },
         }
@@ -153,7 +160,7 @@ exports.uploadContract = () =>
     if (requestType === "Bachelor") {
       // realte the request with req_doc
       await Bachelor.updateOne(
-        { requestDocId: requestDocument.id },
+        { requestDocId: newrequestDocument.id },
         {
           where: { id: requestId },
         }
@@ -163,7 +170,7 @@ exports.uploadContract = () =>
     if (requestType === "PhD") {
       // realte the request with req_doc
       await PhD.updateOne(
-        { requestDocId: requestDocument.id },
+        { requestDocId: newrequestDocument.id },
         {
           where: { id: requestId },
         }
@@ -184,6 +191,9 @@ exports.uploadSignedContract = () =>
     const { offerLetter } = req.body;
 
     //if null
+    if (requestType === null) {
+      return next(new ApiError(`there is no request for this user`, 404));
+    }
 
     if (requestType === "Master") {
       const request = await Master.findOne({
@@ -249,10 +259,10 @@ exports.uploadSignedContract = () =>
       .status(200)
       .json({ message: "signed Contract uploaded successfuly" });
   });
-//pay the fees
+//---------------------------------------------------------------------------------- end step 1 --------------------------------------------
 
-//@desc Get checkout session from stripe and send it as response
-//@route GET /api/v1/orders/checkout-session/cartId
+//---------------------------------------------------------------------------------- start step 2 *****************************************************
+//pay the fees
 //@access protected/user
 exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
   const { requestId } = req.params;
@@ -286,7 +296,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
 
     client_reference_id: requestId,
     metadata: {
-      feesType: req.body.feesType,
+      feesType: "contract_fees",
     },
   });
 
@@ -331,7 +341,7 @@ const createOrderPayFees = async (session) => {
   }
 };
 // the webhook for pay fees
-exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+exports.webhookCheckoutPayFees = asyncHandler(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
 
   let event;
@@ -345,14 +355,17 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  if (event.type === "checkout.session.completed") {
-    createOrderPayFees(event.data.object);
+  if (event.data.object.metadata.feesType === "contract_fees") {
+    if (event.type === "checkout.session.completed") {
+      createOrderPayFees(event.data.object);
+    }
   }
-
   res.status(200).json({ received: true });
 });
+//-------------------------------------------------------------------------------- end step 2 --------------------------------------------
 
-//  upload signed Contract this if first step
+//------------------------------------------------------------------------------------ start step 3 *****************************************************
+//  upload  offer letter this if third step
 //@role : employee
 exports.uploadOfferLetter = () =>
   asyncHandler(async (req, res, next) => {
@@ -373,7 +386,7 @@ exports.uploadOfferLetter = () =>
         return next(new ApiError(`there is no request for this user`, 404));
       }
       // updated the row of the request
-      await RequestDocument.updateOne(
+      await RequestDoc.updateOne(
         { offerLetter: req.body.offerLetter },
         {
           where: { id: request.requestDocId },
@@ -394,7 +407,7 @@ exports.uploadOfferLetter = () =>
         );
       }
       // updated the row of the request
-      await RequestDocument.updateOne(
+      await RequestDoc.updateOne(
         { offerLetter: req.body.offerLetter },
         {
           where: { id: request.requestDocId },
@@ -413,7 +426,7 @@ exports.uploadOfferLetter = () =>
         return next(new ApiError(`there is PhD request for this user`, 404));
       }
       // updated the row of the request
-      await RequestDocument.updateOne(
+      await RequestDoc.updateOne(
         { offerLetter: req.body.offerLetter },
         {
           where: { id: request.requestDocId },
@@ -425,3 +438,377 @@ exports.uploadOfferLetter = () =>
       .status(200)
       .json({ message: "signed Contract uploaded successfuly" });
   });
+
+//  upload signed offer lettert this if third step
+//@ role : user
+exports.uploadSignedOfferLetter = () =>
+  asyncHandler(async (req, res, next) => {
+    const { requestId } = req.params;
+    const requestType = req.user.type;
+    const { signedOfferLetter } = req.body;
+
+    //if null
+    if (requestType === null) {
+      return next(new ApiError(`there is no request for this user`, 404));
+    }
+
+    if (requestType === "Master") {
+      const request = await Master.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is no request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { signedOfferLetter: signedOfferLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------       ELSE     -------------------------------------
+    if (requestType === "Bachelor") {
+      const request = await Bachelor.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(
+          new ApiError(`there is Bachelor request for this user`, 404)
+        );
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { signedOfferLetter: signedOfferLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------    !!  ELSE  !!  -------------------------------------
+
+    if (requestType === "PhD") {
+      const request = await PhD.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is PhD request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { signedOfferLetter: signedOfferLetter },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ message: "signed Contract uploaded successfuly" });
+  });
+//------------------------------------------------------------------------------------end step 3 --------------------------------------------
+
+//------------------------------------------------------------------------------------ start step 4 *****************************************************
+
+//  upload MOHERE this if forth step
+//@ role : user
+exports.uploadMOHERE = () =>
+  asyncHandler(async (req, res, next) => {
+    const { requestId } = req.params;
+    const requestType = req.user.type;
+    const { MOHERE } = req.body;
+
+    //if null
+    if (requestType === null) {
+      return next(new ApiError(`there is no request for this user`, 404));
+    }
+
+    if (requestType === "Master") {
+      const request = await Master.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is no request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { MOHERE: MOHERE },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------       ELSE     -------------------------------------
+    if (requestType === "Bachelor") {
+      const request = await Bachelor.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(
+          new ApiError(`there is Bachelor request for this user`, 404)
+        );
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { MOHERE: MOHERE },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------    !!  ELSE  !!  -------------------------------------
+
+    if (requestType === "PhD") {
+      const request = await PhD.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is PhD request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { MOHERE: MOHERE },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ message: "signed Contract uploaded successfuly" });
+  });
+//------------------------------------------------------------------------------------end step 4 --------------------------------------------
+
+//------------------------------------------------------------------------------------ start step 5 *****************************************************
+
+//pay visa fees
+
+//@access protected/user
+exports.checkoutSessionToPayVisaFees = asyncHandler(async (req, res, next) => {
+  const { requestId } = req.params;
+  const request = req.user.type;
+  let feesPrrice;
+  if (request === "Bachelor") {
+    //select object   --> get price
+    feesPrrice = process.env.BachelorFeesPrices;
+  } else if (request === "Master") {
+    feesPrrice = process.env.MasterFeesPrices;
+  } else if (request === "PhD") {
+    feesPrrice = process.env.PhDFeesPrices;
+  }
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        price_data: {
+          unit_amount: feesPrrice * 100,
+          currency: "usd",
+          product_data: {
+            name: req.user.username,
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${req.protocol}://${req.get("host")}`,
+    cancel_url: `${req.protocol}://${req.get("host")}`,
+    customer_email: req.user.email,
+
+    client_reference_id: requestId,
+    metadata: {
+      feesType: "visa_fees",
+    },
+  });
+
+  //3) send session to response
+  res.status(200).json({ status: "success", session });
+});
+const createOrderPayVisaFees = async (session) => {
+  const requestId = session.client_reference_id;
+  const orderPrice = session.amount_total / 100;
+  //type = metadata visa /contract
+  const { feesType } = session.metadata;
+  const user = await User.findOne({ email: session.customer_email });
+  const request = user.type;
+
+  const order = await Order.create({
+    UserId: user.id,
+    requstId: requestId,
+    type: feesType,
+    totalOrderPrice: orderPrice,
+    isPaid: 1,
+    paidAt: Date.now(),
+  });
+
+  if (order) {
+    //got to next step
+    if (request === "Bachelor") {
+      const Therequest = await Bachelor.findByPk(requestId);
+
+      Therequest.currentStep = "sending_offerLetter";
+      await Therequest.save();
+    } else if (request === "Master") {
+      const Therequest = await Master.findByPk(requestId);
+
+      Therequest.currentStep = "sending_offerLetter";
+      await Therequest.save();
+    } else if (request === "PhD") {
+      const Therequest = await PhD.findByPk(requestId);
+
+      Therequest.currentStep = "sending_offerLetter";
+      await Therequest.save();
+    }
+  }
+};
+// the webhook for pay fees
+exports.webhookCheckoutPayVisaFees = asyncHandler(async (req, res, next) => {
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  if (event.data.object.metadata.feesType === "visa_fees") {
+    if (event.type === "checkout.session.completed") {
+      createOrderPayVisaFees(event.data.object);
+    }
+  }
+  res.status(200).json({ received: true });
+});
+
+//------------------------------------------------------------------------------------end step 5 --------------------------------------------
+
+//------------------------------------------------------------------------------------ start step 6 *****************************************************
+
+//pay visa fees
+
+//@access protected/user
+exports.checkoutSessionToRegistrationFees = asyncHandler(
+  async (req, res, next) => {
+    const { requestId } = req.params;
+    const request = req.user.type;
+    let feesPrrice;
+    if (request === "Bachelor") {
+      //select object   --> get price
+      feesPrrice = process.env.BachelorFeesPrices;
+    } else if (request === "Master") {
+      feesPrrice = process.env.MasterFeesPrices;
+    } else if (request === "PhD") {
+      feesPrrice = process.env.PhDFeesPrices;
+    }
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            unit_amount: feesPrrice * 100,
+            currency: "usd",
+            product_data: {
+              name: req.user.username,
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `${req.protocol}://${req.get("host")}`,
+      cancel_url: `${req.protocol}://${req.get("host")}`,
+      customer_email: req.user.email,
+
+      client_reference_id: requestId,
+      metadata: {
+        feesType: "registration_fees",
+      },
+    });
+
+    //3) send session to response
+    res.status(200).json({ status: "success", session });
+  }
+);
+const createOrderPayRegistrationFees = async (session) => {
+  const requestId = session.client_reference_id;
+  const orderPrice = session.amount_total / 100;
+  //type = metadata visa /contract
+  const { feesType } = session.metadata;
+  const user = await User.findOne({ email: session.customer_email });
+  const request = user.type;
+
+  const order = await Order.create({
+    UserId: user.id,
+    requstId: requestId,
+    type: feesType,
+    totalOrderPrice: orderPrice,
+    isPaid: 1,
+    paidAt: Date.now(),
+  });
+
+  if (order) {
+    //got to next step
+    if (request === "Bachelor") {
+      const Therequest = await Bachelor.findByPk(requestId);
+
+      Therequest.currentStep = "sending_offerLetter";
+      await Therequest.save();
+    } else if (request === "Master") {
+      const Therequest = await Master.findByPk(requestId);
+
+      Therequest.currentStep = "sending_offerLetter";
+      await Therequest.save();
+    } else if (request === "PhD") {
+      const Therequest = await PhD.findByPk(requestId);
+
+      Therequest.currentStep = "sending_offerLetter";
+      await Therequest.save();
+    }
+  }
+};
+// the webhook for pay fees
+exports.webhookCheckoutRegistrationFees = asyncHandler(async (req, res, next) => {
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  if (event.data.object.metadata.feesType === "registration_fees") {
+    if (event.type === "checkout.session.completed") {
+      createOrderPayRegistrationFees(event.data.object);
+    }
+  }
+  res.status(200).json({ received: true });
+});
+
+//------------------------------------------------------------------------------------end step 6 --------------------------------------------

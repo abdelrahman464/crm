@@ -49,7 +49,7 @@ module.exports = (db, DataTypes) => {
         "getting_EMGS_approval", //10- make function for employee to update it to next step
         "registration_fees", //11- with webhook  he automatically go to next step
         "getting_final_acceptance_letter", // 12-make function for employee to update it to next step
-        "recieving_ticket_copy", //13-make fuction for user to upload his ticket  //14-make one for employee to check and move him
+        "recieving_ticket        _copy", //13-make fuction for user to upload his ticket  //14-make one for employee to check and move him
         "applying_for_visa", //14-make one for employee to check and move him and pickup airport ticket or something
         "arranging_airport_pickup" //thack you
       ),

@@ -55,7 +55,7 @@ module.exports = (db, DataTypes) => {
       defaultValue: false,
     },
     role: {
-      type: DataTypes.ENUM("admin", "user"),
+      type: DataTypes.ENUM("admin", "user","employee"),
       allowNull: false,
       defaultValue: "user",
     },
