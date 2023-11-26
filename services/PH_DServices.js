@@ -197,3 +197,36 @@ exports.getAllPhDs = getAll(PhD, "PhD");
 exports.deletePhD = deleteOne(PhD);
 
 exports.goToNextStepAftersignContract = nextStep("PhD", "contract_fees");
+
+exports.goToNextStepAftersignContract = nextStep("PhD", "contract_fees");
+exports.goToNextStepAftercontractFees = nextStep("PhD", "sending_offerLetter");
+exports.goToNextStepAftersendingOfferLetter = nextStep(
+  "PhD",
+  "deliver_and_sign_offerLetter"
+);
+exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
+  "PhD",
+  "get_copy_of_mohere"
+);
+exports.goToNextStepAftergetCopyOfMohere = nextStep("PhD", "visa_fees");
+exports.goToNextStepAftervisaFees = nextStep("PhD", "getting_EMGS_approval");
+exports.goToNextStepAftergettingEMGSApproval = nextStep(
+  "PhD",
+  "registration_fees"
+);
+exports.goToNextStepAfterregistrationFees = nextStep(
+  "PhD",
+  "getting_final_acceptance_letter"
+);
+exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
+  "PhD",
+  "recieving_ticket_copy"
+);
+exports.goToNextStepAfterrecievingTicketCopy = nextStep(
+  "PhD",
+  "applying_for_visa"
+);
+exports.goToNextStepAfterapplyingForVisa = nextStep(
+  "PhD",
+  "arranging_airport_pickup"
+);

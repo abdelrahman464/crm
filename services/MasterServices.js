@@ -66,9 +66,7 @@ exports.resize = asyncHandler(async (req, res, next) => {
       fs.writeFileSync(pdfPath, pdfFile.buffer);
       req.body.Passport = pdfFileName;
     } else {
-      return next(
-        new ApiError("Invalid Passport file format", 400)
-      );
+      return next(new ApiError("Invalid Passport file format", 400));
     }
   }
   if (req.files.PersonalPicture) {
@@ -198,3 +196,37 @@ exports.getAllMasters = getAll(Master, "Master");
 exports.deleteMaster = deleteOne(Master);
 
 exports.goToNextStepAftersignContract = nextStep("Master", "contract_fees");
+exports.goToNextStepAftercontractFees = nextStep(
+  "Master",
+  "sending_offerLetter"
+);
+exports.goToNextStepAftersendingOfferLetter = nextStep(
+  "Master",
+  "deliver_and_sign_offerLetter"
+);
+exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
+  "Master",
+  "get_copy_of_mohere"
+);
+exports.goToNextStepAftergetCopyOfMohere = nextStep("Master", "visa_fees");
+exports.goToNextStepAftervisaFees = nextStep("Master", "getting_EMGS_approval");
+exports.goToNextStepAftergettingEMGSApproval = nextStep(
+  "Master",
+  "registration_fees"
+);
+exports.goToNextStepAfterregistrationFees = nextStep(
+  "Master",
+  "getting_final_acceptance_letter"
+);
+exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
+  "Master",
+  "recieving_ticket_copy"
+);
+exports.goToNextStepAfterrecievingTicketCopy = nextStep(
+  "Master",
+  "applying_for_visa"
+);
+exports.goToNextStepAfterapplyingForVisa = nextStep(
+  "Master",
+  "arranging_airport_pickup"
+);

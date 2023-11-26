@@ -119,14 +119,40 @@ exports.getAllBachelors = getAll(Bachelor, "Bachelor");
 exports.deleteBachelor = deleteOne(Bachelor);
 
 exports.goToNextStepAftersignContract = nextStep("Bachelor", "contract_fees");
-exports.goToNextStepAftercontractFees = nextStep("Bachelor", "sending_offerLetter");
-exports.goToNextStepAftersendingOfferLetter = nextStep("Bachelor", "deliver_and_sign_offerLetter");
-exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep("Bachelor", "get_copy_of_mohere");
+exports.goToNextStepAftercontractFees = nextStep(
+  "Bachelor",
+  "sending_offerLetter"
+);
+exports.goToNextStepAftersendingOfferLetter = nextStep(
+  "Bachelor",
+  "deliver_and_sign_offerLetter"
+);
+exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
+  "Bachelor",
+  "get_copy_of_mohere"
+);
 exports.goToNextStepAftergetCopyOfMohere = nextStep("Bachelor", "visa_fees");
-exports.goToNextStepAftervisaFees = nextStep("Bachelor", "getting_EMGS_approval");
-exports.goToNextStepAftergettingEMGSApproval = nextStep("Bachelor", "registration_fees");
-exports.goToNextStepAfterregistrationFees = nextStep("Bachelor", "getting_final_acceptance_letter");
-exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep("Bachelor", "recieving_ticket_copy");
-exports.goToNextStepAfterrecievingTicketCopy = nextStep("Bachelor", "applying_for_visa");
-exports.goToNextStepAfterapplyingForVisa = nextStep("Bachelor", "arranging_airport_pickup");
-
+exports.goToNextStepAftervisaFees = nextStep(
+  "Bachelor",
+  "getting_EMGS_approval"
+);
+exports.goToNextStepAftergettingEMGSApproval = nextStep(
+  "Bachelor",
+  "registration_fees"
+);
+exports.goToNextStepAfterregistrationFees = nextStep(
+  "Bachelor",
+  "getting_final_acceptance_letter"
+);
+exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
+  "Bachelor",
+  "recieving_ticket_copy"
+);
+exports.goToNextStepAfterrecievingTicketCopy = nextStep(
+  "Bachelor",
+  "applying_for_visa"
+);
+exports.goToNextStepAfterapplyingForVisa = nextStep(
+  "Bachelor",
+  "arranging_airport_pickup"
+);
