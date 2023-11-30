@@ -27,6 +27,10 @@ exports.uploads = uploadMixOfImages([
     name: "MOHERE",
     maxCount: 1,
   },
+  {
+    name: "applyingForVisa",
+    maxCount: 1,
+  },
 ]);
 // Processing middleware for resizing and saving BankAccountFile
 exports.resize = asyncHandler(async (req, res, next) => {
@@ -85,7 +89,17 @@ exports.resize = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Invalid MOHERE file format", 400));
     }
   }
-
+  if (req.files.ticket) {
+    const pdfFile = req.files.ticket[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `ticket-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/ticket/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.ticket = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid ticket file format", 400));
+    }
+  }
   next();
 });
 //@actore  employee
@@ -593,9 +607,7 @@ exports.uploadMOHERE = () =>
       );
     }
 
-    return res
-      .status(200)
-      .json({ message: "signed Contract uploaded successfuly" });
+    return res.status(200).json({ message: "MOHERE uploaded successfuly" });
   });
 //------------------------------------------------------------------------------------end step 4 --------------------------------------------
 
@@ -789,26 +801,185 @@ const createOrderPayRegistrationFees = async (session) => {
   }
 };
 // the webhook for pay fees
-exports.webhookCheckoutRegistrationFees = asyncHandler(async (req, res, next) => {
-  const sig = req.headers["stripe-signature"];
+exports.webhookCheckoutRegistrationFees = asyncHandler(
+  async (req, res, next) => {
+    const sig = req.headers["stripe-signature"];
 
-  let event;
+    let event;
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-  if (event.data.object.metadata.feesType === "registration_fees") {
-    if (event.type === "checkout.session.completed") {
-      createOrderPayRegistrationFees(event.data.object);
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
+    if (event.data.object.metadata.feesType === "registration_fees") {
+      if (event.type === "checkout.session.completed") {
+        createOrderPayRegistrationFees(event.data.object);
+      }
+    }
+    res.status(200).json({ received: true });
   }
-  res.status(200).json({ received: true });
-});
+);
 
 //------------------------------------------------------------------------------------end step 6 --------------------------------------------
+//------------------------------------------------------------------------------------ start step 7 *****************************************************
+
+//  upload ticket
+//@ role : user
+exports.uploadTicket = () =>
+  asyncHandler(async (req, res, next) => {
+    const { requestId } = req.params;
+    const requestType = req.user.type;
+    const { ticket } = req.body;
+
+    //if null
+    if (requestType === null) {
+      return next(new ApiError(`there is no request for this user`, 404));
+    }
+
+    if (requestType === "Master") {
+      const request = await Master.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is no request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { ticket: ticket },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------       ELSE     -------------------------------------
+    if (requestType === "Bachelor") {
+      const request = await Bachelor.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(
+          new ApiError(`there is Bachelor request for this user`, 404)
+        );
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { ticket: ticket },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------    !!  ELSE  !!  -------------------------------------
+
+    if (requestType === "PhD") {
+      const request = await PhD.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is PhD request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { ticket: ticket },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+
+    return res.status(200).json({ message: "ticket uploaded successfuly" });
+  });
+//------------------------------------------------------------------------------------end step 7 --------------------------------------------
+//------------------------------------------------------------------------------------ start step 8 *****************************************************
+
+//  upload ticket
+//@ role : user
+exports.applyForVisa = () =>
+  asyncHandler(async (req, res, next) => {
+    const { requestId } = req.params;
+    const requestType = req.user.type;
+
+    //if null
+    if (requestType === null) {
+      return next(new ApiError(`there is no request for this user`, 404));
+    }
+
+    if (requestType === "Master") {
+      const request = await Master.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is no request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { applyingForVisa: 1 },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------       ELSE     -------------------------------------
+    if (requestType === "Bachelor") {
+      const request = await Bachelor.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(
+          new ApiError(`there is Bachelor request for this user`, 404)
+        );
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { applyingForVisa: 1 },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+    //-----------------------------    !!  ELSE  !!  -------------------------------------
+
+    if (requestType === "PhD") {
+      const request = await PhD.findOne({
+        where: {
+          id: requestId,
+        },
+      });
+      // Check if there requests in the Master table for this user
+      if (request.length > 0) {
+        return next(new ApiError(`there is PhD request for this user`, 404));
+      }
+      // updated the row of the request
+      await RequestDoc.updateOne(
+        { applyingForVisa: 1 },
+        {
+          where: { id: request.requestDocId },
+        }
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ message: "your request to visa sending successfuly" });
+  });
+//------------------------------------------------------------------------------------end step 8 --------------------------------------------

@@ -17,7 +17,6 @@ module.exports = (db, DataTypes) => {
       //employee
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     signedOfferLetter: {
       type: DataTypes.STRING,
@@ -26,13 +25,19 @@ module.exports = (db, DataTypes) => {
     MOHERE: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     MOHEREApproval: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
+    ticket: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    applyingForVisa:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    }
   });
 
   function setUrls(instance) {
@@ -67,6 +72,12 @@ module.exports = (db, DataTypes) => {
         !instance.MOHERE.startsWith(process.env.BASE_URL)
       ) {
         instance.MOHERE = `${process.env.BASE_URL}/RequestDocument/MOHERE/${instance.MOHERE}`;
+      }
+      if (
+        instance.ticket &&
+        !instance.ticket.startsWith(process.env.BASE_URL)
+      ) {
+        instance.ticket = `${process.env.BASE_URL}/RequestDocument/ticket/${instance.ticket}`;
       }
     }
   }
