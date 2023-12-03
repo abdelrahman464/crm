@@ -47,13 +47,13 @@ PHD.belongsTo(User, { as: "Employee", foreignKey: "employeeId" });
 
 //relation of orders , requst has many order
 Bachelor.hasMany(Order, { as: "BachelorOrders", foreignKey: "requstId" });
-Order.belongsTo(Bachelor, { as: "Requests", foreignKey: "requstId" });
+Order.belongsTo(Bachelor, { as: "BRequests", foreignKey: "requstId" });
 
 Master.hasMany(Order, { as: "MasterOrders", foreignKey: "requstId" });
-Order.belongsTo(Master, { as: "Requests", foreignKey: "requstId" });
+Order.belongsTo(Master, { as: "MRequests", foreignKey: "requstId" });
 
 PHD.hasMany(Order, { as: "PHDOrders", foreignKey: "requstId" });
-Order.belongsTo(PHD, { as: "Requests", foreignKey: "requstId" });
+Order.belongsTo(PHD, { as: "PRequests", foreignKey: "requstId" });
 
 // Create one-to-one relationship between RequestDoc and Bachelor
 RequestDoc.hasOne(Bachelor, { as: "BachelorInfo", foreignKey: "requestDocId" });

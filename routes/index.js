@@ -3,7 +3,8 @@ const authRoute = require("./authRoute");
 const BechlortRoute=require('./BachelorRoute')
 const MasterRoute=require('./MasterRoute')
 const PHDRoute=require('./PHDRoute')
-// const CrmRoute=require('./CrmRoute')
+const ProgressRoute=require('./progressRoute')
+const CrmRoute=require('./CrmRoute')
 
 const mountRoutes = (app) => {
   // Mount Routes
@@ -12,6 +13,7 @@ const mountRoutes = (app) => {
   app.use("/api/v1/bechlor", BechlortRoute);
   app.use("/api/v1/master", MasterRoute);
   app.use("/api/v1/phd", PHDRoute);
-  // app.use("/api/v1/crm", CrmRoute);
+  app.use("/api/v1/progress", ProgressRoute);
+  app.use("/api/v1/crm", CrmRoute);
 };
 module.exports = mountRoutes;

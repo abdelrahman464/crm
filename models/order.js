@@ -15,11 +15,10 @@ module.exports = (db, DataTypes) => {
     },
     type: {
       type: DataTypes.ENUM("contract_fees", "visa_fees","registration_fees"),
-      defaultValue: "unnknown",
       allowNull: false,
     },
     totalOrderPrice: {
-      type: DataTypes.Number,
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
   });
