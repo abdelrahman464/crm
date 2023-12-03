@@ -3,7 +3,7 @@ const express = require("express");
 const { protect, allowedTo } = require("../services/authServices");
 
 const {
- assignEmployeeForRequest,removeEmployeeFormRequest
+ assignEmployeeForRequest,removeEmployeeFromRequest
 } = require("../services/CrmService");
 
 const router = express.Router();
@@ -13,6 +13,6 @@ router
   .put(protect,allowedTo("admin"),assignEmployeeForRequest)
 router
   .route("/remove")
-  .put(protect,allowedTo("admin"),removeEmployeeFormRequest)
+  .put(protect,allowedTo("admin"),removeEmployeeFromRequest)
   
 module.exports = router;

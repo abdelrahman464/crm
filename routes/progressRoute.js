@@ -19,6 +19,8 @@ const {
 const router = express.Router();
 
 //-----------------------------------------------------------------------------------------------------------------------------
+
+//valid who upload the contract is the employee that has assigned to request
 router
   .route("/uploadContract/:requestId/:requestType")
   .post(
@@ -30,6 +32,7 @@ router
   );
 
 //-----------------------------------------------------------------------------------------------------------------------------
+//valid who upload the signed contract is the user who sent request
 router
   .route("/uploadSignedContract/:requestId")
   .post(protect, allowedTo("user"), uploads, resize, uploadSignedContract);
@@ -51,8 +54,8 @@ router
   .post(protect, allowedTo("user"), uploads, resize, uploadSignedOfferLetter);
 //-----------------------------------------------------------------------------------------------------------------------------
 router
-  .route("/uploadMOHERE/:requestId")
-  .post(protect, allowedTo("user"), uploads, resize, uploadMOHERE);
+  .route("/uploadMOHERE/:requestId/:requestType")
+  .post(protect, allowedTo("employee"), uploads, resize, uploadMOHERE);
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadTicket/:requestId")
@@ -62,17 +65,18 @@ router
   .route("/applyForVisa/:requestId")
   .post(protect, allowedTo("user"), applyForVisa);
 
-//-----------------------------------------------------------------------------------------------------------------------------
-router.post(
-  "/webhookPayVisaFees",
-  express.raw({ type: "application/json" }),
-  webhookCheckoutPayVisaFees
-);
+//------------------------WEBHOOKS--------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------
 router.post(
   "/webhookPayFees",
   express.raw({ type: "application/json" }),
   webhookCheckoutPayFees
+);
+//-----------------------------------------------------------------------------------------------------------------------------
+router.post(
+  "/webhookPayVisaFees",
+  express.raw({ type: "application/json" }),
+  webhookCheckoutPayVisaFees
 );
 //-----------------------------------------------------------------------------------------------------------------------------
 router.post(

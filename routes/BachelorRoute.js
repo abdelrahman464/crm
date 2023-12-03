@@ -13,17 +13,17 @@ const {
   deleteBachelor,
   uploads,
   resize,
-  goToNextStepAfterapplyingForVisa,
+  goToNextStepAftersignContract,
   goToNextStepAftercontractFees,
+  goToNextStepAftersendingOfferLetter,
   goToNextStepAfterdeliverAndSignOfferLetter,
   goToNextStepAftergetCopyOfMohere,
+  goToNextStepAftervisaFees,
   goToNextStepAftergettingEMGSApproval,
+  goToNextStepAfterregistrationFees,
   goToNextStepAftergettingFinalAcceptanceLetter,
   goToNextStepAfterrecievingTicketCopy,
-  goToNextStepAfterregistrationFees,
-  goToNextStepAftersendingOfferLetter,
-  goToNextStepAftersignContract,
-  goToNextStepAftervisaFees,
+  goToNextStepAfterapplyingForVisa,
 } = require("../services/BachelorServices");
 
 const router = express.Router();
@@ -47,45 +47,45 @@ router.route("/:id").delete(protect, allowedTo("admin"), deleteBachelor).get(
 router.route("/:id").post(protect, allowedTo("admin"), updateBachelorRequest);
 
 router
-  .route("/goToNextStepAfterapplyingForVisa")
+  .route("/goToNextStepAfterapplyingForVisa/:id")
   .post(protect, allowedTo("employee"), goToNextStepAfterapplyingForVisa);
 router
-  .route("/goToNextStepAftercontractFees")
+  .route("/goToNextStepAftercontractFees/:id")
   .post(protect, allowedTo("employee"), goToNextStepAftercontractFees);
 router
-  .route("/goToNextStepAfterdeliverAndSignOfferLetter")
+  .route("/goToNextStepAfterdeliverAndSignOfferLetter/:id")
   .post(
     protect,
     allowedTo("employee"),
     goToNextStepAfterdeliverAndSignOfferLetter
   );
 router
-  .route("/goToNextStepAftergetCopyOfMohere")
+  .route("/goToNextStepAftergetCopyOfMohere/:id")
   .post(protect, allowedTo("employee"), goToNextStepAftergetCopyOfMohere);
 router
-  .route("/goToNextStepAftergettingEMGSApproval")
+  .route("/goToNextStepAftergettingEMGSApproval/:id")
   .post(protect, allowedTo("employee"), goToNextStepAftergettingEMGSApproval);
 router
-  .route("/goToNextStepAftergettingFinalAcceptanceLetter")
+  .route("/goToNextStepAftergettingFinalAcceptanceLetter/:id")
   .post(
     protect,
     allowedTo("employee"),
     goToNextStepAftergettingFinalAcceptanceLetter
   );
 router
-  .route("/goToNextStepAfterrecievingTicketCopy")
+  .route("/goToNextStepAfterrecievingTicketCopy/:id")
   .post(protect, allowedTo("employee"), goToNextStepAfterrecievingTicketCopy);
 router
-  .route("/goToNextStepAfterregistrationFees")
+  .route("/goToNextStepAfterregistrationFees/:id")
   .post(protect, allowedTo("employee"), goToNextStepAfterregistrationFees);
 router
-  .route("/goToNextStepAftersendingOfferLetter")
+  .route("/goToNextStepAftersendingOfferLetter/:id")
   .post(protect, allowedTo("employee"), goToNextStepAftersendingOfferLetter);
 router
-  .route("/goToNextStepAftersignContract")
+  .route("/goToNextStepAftersignContract/:id")
   .post(protect, allowedTo("employee"), goToNextStepAftersignContract);
 router
-  .route("/goToNextStepAftervisaFees")
+  .route("/goToNextStepAftervisaFees/:id")
   .post(protect, allowedTo("employee"), goToNextStepAftervisaFees);
 
 module.exports = router;

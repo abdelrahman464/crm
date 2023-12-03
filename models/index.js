@@ -56,19 +56,16 @@ PHD.hasMany(Order, { as: "PHDOrders", foreignKey: "requstId" });
 Order.belongsTo(PHD, { as: "PRequests", foreignKey: "requstId" });
 
 // Create one-to-one relationship between RequestDoc and Bachelor
-RequestDoc.hasOne(Bachelor, { as: "BachelorInfo", foreignKey: "requestDocId" });
-Bachelor.belongsTo(RequestDoc, {
-  as: "RequestDoc",
-  foreignKey: "requestDocId",
-});
+RequestDoc.hasOne(Bachelor, { foreignKey: "requestDocId" });
+Bachelor.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
 
 // Create one-to-one relationship between RequestDoc and Master
-RequestDoc.hasOne(Master, { as: "MasterInfo", foreignKey: "requestDocId" });
-Master.belongsTo(RequestDoc, { as: "RequestDoc", foreignKey: "requestDocId" });
+RequestDoc.hasOne(Master, { foreignKey: "requestDocId" });
+Master.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
 
 // Create one-to-one relationship between RequestDoc and PHD
-RequestDoc.hasOne(PHD, { as: "PHDInfo", foreignKey: "requestDocId" });
-PHD.belongsTo(RequestDoc, { as: "RequestDoc", foreignKey: "requestDocId" });
+RequestDoc.hasOne(PHD, { foreignKey: "requestDocId" });
+PHD.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
 
 //for user and order
 User.hasMany(Order, { as: "userOrders", foreignKey: "UserId" });

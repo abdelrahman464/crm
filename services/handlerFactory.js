@@ -27,7 +27,6 @@ exports.updateOne = (Model) =>
 
 exports.createOne = (Model) =>
   asyncHandler(async (req, res) => {
-    console.log(req.body);
     const document = await Model.create(req.body);
     res.status(201).json({ data: document });
   });
@@ -89,7 +88,7 @@ exports.deleteOne = (Model) =>
 ///////////////////////////////////////////////////////////
 exports.sendRequest = (Model, ModelName) =>
   asyncHandler(async (req, res) => {
-    let obj = {};
+    let obj;
     if (ModelName === "Bachelor") {
       obj = {
         UserId: req.user.id,
@@ -133,17 +132,27 @@ exports.sendRequest = (Model, ModelName) =>
         ResearchProposal: req.body.ResearchProposal,
       };
     }
-    const newRequest = await Model.create(obj);
-    await User.updateOne(
-      { type: "ModelName" },
-      {
-        where: { id: req.user.id },
-      }
-    );
-    // Respond with a success message or the new request object
-    return res
-      .status(200)
-      .json({ message: "Request sent successfully", request: newRequest });
+
+    try {
+      console.log(`this is ${obj}`);
+      const newRequest = await Model.create(obj);
+      console.log(`after this is ${obj}`);
+
+      // Update User type
+      await User.update(
+        { type: ModelName },
+        {
+          where: { id: req.user.id },
+        }
+      );
+
+      return res
+        .status(200)
+        .json({ message: "Request sent successfully", request: newRequest });
+    } catch (error) {
+      console.error("Error sending request:", error);
+      return res.status(500).json({ error: "Failed to send request" });
+    }
   });
 
 // update the request eligiblilty by admin

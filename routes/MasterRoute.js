@@ -6,6 +6,8 @@ const {
   filterRequests,
 } = require("../services/handlerFactory");
 const {
+  uploads,
+  resize,
   getAllMasters,
   getMasterById,
   updateMasterRequest,
@@ -29,7 +31,14 @@ const router = express.Router();
 router
   .route("/")
   .get(protect, filterRequests, getAllMasters)
-  .post(protect, allowedTo("user"), canSendRequest, sendMasterRequest);
+  .post(
+    protect,
+    allowedTo("user"),
+    canSendRequest,
+    uploads,
+    resize,
+    sendMasterRequest
+  );
 router
   .route("/:id")
   .delete(protect, allowedTo("admin"), deleteMaster)

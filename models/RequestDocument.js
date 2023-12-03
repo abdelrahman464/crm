@@ -16,7 +16,7 @@ module.exports = (db, DataTypes) => {
     offerLetter: {
       //employee
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     signedOfferLetter: {
       type: DataTypes.STRING,
@@ -24,20 +24,20 @@ module.exports = (db, DataTypes) => {
     },
     MOHERE: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     MOHEREApproval: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     ticket: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
-    applyingForVisa:{
+    applyingForVisa: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    }
+    },
   });
 
   function setUrls(instance) {
