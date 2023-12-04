@@ -16,6 +16,8 @@ const MasterModel = require("./Master");
 const PhDModel = require("./Ph_D");
 const RequestDocumentModel = require("./RequestDocument");
 const OrderModel = require("./order");
+const NotificationModel = require("./Notification");
+
 
 //createa models
 const User = UserModel(db, Sequelize);
@@ -24,6 +26,7 @@ const Master = MasterModel(db, Sequelize);
 const PHD = PhDModel(db, Sequelize);
 const RequestDoc = RequestDocumentModel(db, Sequelize);
 const Order = OrderModel(db, Sequelize);
+const Notification = NotificationModel(db, Sequelize);
 
 //define relationships
 //User & Bachelor => relationships (one to many)
@@ -71,6 +74,12 @@ PHD.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
 User.hasMany(Order, { as: "userOrders", foreignKey: "UserId" });
 Order.belongsTo(User, { as: "userOrders", foreignKey: "UserId" });
 // ... (the rest of your code)
+
+// relationship between User and Notification
+User.hasMany(Notification, { foreignKey: 'UserId', as: 'notifications' });
+Notification.belongsTo(User, { foreignKey: 'UserId' });
+
+
 
 //generate tables in DB
 db.sync({ force: false }).then(() => {
