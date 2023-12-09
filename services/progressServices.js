@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const { Master, Bachelor, PhD, User, Order, RequestDoc } = require("../models");
 const ApiError = require("../utils/apiError");
+const { createNotification } = require("./notificationService");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
 exports.uploads = uploadMixOfImages([
@@ -112,6 +113,18 @@ exports.nextStep = (requestName, stepName, Model) =>
   asyncHandler(async (req, res, next) => {
     const requestId = req.params.id;
 
+    // Check if the request exists
+    const request = await Model.findByPk(requestId);
+    if (!request) {
+      return next(new ApiError(`Document Not Found`, 404));
+    }
+
+    // Check if the associated user exists
+    const user = await User.findByPk(request.UserId);
+    if (!user) {
+      return next(new ApiError(`User Not Found`, 404));
+    }
+
     const [affectedRowCount] = await Model.update(
       { currentStep: stepName },
       { where: { id: requestId } }
@@ -121,14 +134,20 @@ exports.nextStep = (requestName, stepName, Model) =>
       return next(new ApiError(`Document Not Found`, 404));
     }
 
+    // Create notification
+    const message = `Your request ${requestName} has been updated to ${stepName} by ${req.user.username}`;
+    await createNotification(user.id, message);
+
     res.status(200).json({
-      msg: `Request updated successfully ,Current Step is  ${stepName}`,
+      msg: `Request updated successfully, Current Step is ${stepName}`,
     });
   });
 
 //---------------------------------------------------------------------------------- start step 1 *****************************************************
 //upload Contract this if first step
 //@role : employee
+
+// we need calidation here to ensure that the empolyee who upload the contract is the one who assigned to request
 exports.uploadContract = asyncHandler(async (req, res, next) => {
   const { requestId, requestType } = req.params;
 
@@ -157,15 +176,31 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
   }
 
   if (modelToUpdate) {
-    await modelToUpdate.update(
+    const [affectedRowCount] = await modelToUpdate.update(
       { requestDocId: newRequestDocument.id },
       { where: { id: requestId } }
     );
+
+    if (affectedRowCount === 0) {
+      return next(new ApiError(`Document Not Found`, 404));
+    }
+
+    // Fetch the user associated with the request
+    const request = await modelToUpdate.findByPk(requestId);
+    const user = await User.findByPk(request.UserId);
+
+    if (!user) {
+      return next(new ApiError(`User Not Found`, 404));
+    }
+
+    // Create notification for the user
+    const message = `A new contract has been uploaded for your ${requestType} request`;
+    await createNotification(user.id, message);
   }
 
   return res.status(200).json({
-    message: " contract uploaded successfully",
-    newRequestDocument: newRequestDocument, // Include newly created Request Document in the response
+    message: "Contract uploaded successfully",
+    newRequestDocument: newRequestDocument,
   });
 });
 
@@ -204,7 +239,15 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
     return next(new ApiError(`No request found for this user`, 404));
   }
 
-  const { requestDocId } = request;
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
+
+  // gathering data from request
+  const { requestDocId, employeeId } = request;
 
   if (!requestDocId) {
     return next(new ApiError(`No associated request document found`, 404));
@@ -219,6 +262,17 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
   if (updatedRowCount === 0) {
     return next(new ApiError(`Failed to update request document`, 500));
   }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A signed contract has been uploaded for a request "${requestType}" assigned to you, user: ${req.user.username}`;
+  await createNotification(employee.id, message);
 
   // Fetch and return the updated request document
   const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
@@ -339,7 +393,7 @@ exports.webhookCheckoutPayFees = asyncHandler(async (req, res, next) => {
 //@role : employee
 exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
   const { requestId, requestType } = req.params;
-
+  const employeeId = req.user.id;
   // Check if requestType is valid
   if (!["Bachelor", "Master", "PhD"].includes(requestType)) {
     return next(new ApiError(`Invalid request type`, 400));
@@ -377,6 +431,12 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
   if (!request.requestDocId) {
     return next(new ApiError(`No associated request document found`, 404));
   }
+  // Ensure the authenticated employee matches the employee in the request
+  if (employeeId !== request.employeeId) {
+    return next(
+      new ApiError(`Unauthorized: Employee mismatch for this request`, 403)
+    );
+  }
 
   // Update the RequestDoc with the offer letter
   const [updatedRowCount] = await RequestDoc.update(
@@ -389,6 +449,17 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
   if (updatedRowCount === 0) {
     return next(new ApiError(`Failed to update request document`, 500));
   }
+
+  // Fetch the user associated with the request
+  const user = await User.findByPk(request.UserId);
+
+  if (!user) {
+    return next(new ApiError(`User Not Found`, 404));
+  }
+
+  // Create notification for the user
+  const message = `An offer letter has been uploaded for your ${requestType} request`;
+  await createNotification(user.id, message);
 
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
@@ -433,6 +504,12 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
   if (!request) {
     return next(new ApiError(`No request found for this user`, 404));
   }
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
 
   if (!request.requestDocId) {
     return next(new ApiError(`No associated request document found`, 404));
@@ -446,6 +523,17 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
   if (updatedRowCount === 0) {
     return next(new ApiError(`Failed to update request document`, 500));
   }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(request.employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A signed offer letter has been uploaded for a request "${requestType}" assigned to you, user:${req.user.username}`;
+  await createNotification(employee.id, message);
 
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -496,23 +584,37 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
   if (!request) {
     return next(new ApiError(`No request found for this user`, 404));
   }
-
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
   // Check if there is a requestDocId associated with the request
   if (!request.requestDocId) {
     return next(new ApiError(`No associated request document found`, 404));
   }
 
-  // Update the RequestDoc with the offer letter
+  // Update the RequestDoc with the MOHERE document
   const [updatedRowCount] = await RequestDoc.update(
     { MOHERE: req.body.MOHERE },
-    {
-      where: { id: request.requestDocId },
-    }
+    { where: { id: request.requestDocId } }
   );
 
   if (updatedRowCount === 0) {
     return next(new ApiError(`Failed to update request document`, 500));
   }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(request.employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A MOHERE document has been uploaded for a request assigned to you`;
+  await createNotification(employee.id, message);
 
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
@@ -776,7 +878,12 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
   if (!request) {
     return next(new ApiError(`No request found for this user`, 404));
   }
-
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
   if (!request.requestDocId) {
     return next(new ApiError(`No associated request document found`, 404));
   }
@@ -789,6 +896,17 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
   if (updatedRowCount === 0) {
     return next(new ApiError(`Failed to update request document`, 500));
   }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(request.employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A ticket document has been uploaded for a request assigned to you, user:${req.user.username}`;
+  await createNotification(employee.id, message);
 
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -834,7 +952,12 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
   if (!request) {
     return next(new ApiError(`No request found for this user`, 404));
   }
-
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
   if (!request.requestDocId) {
     return next(new ApiError(`No associated request document found`, 404));
   }
@@ -847,6 +970,17 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
   if (updatedRowCount === 0) {
     return next(new ApiError(`Failed to update request document`, 500));
   }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(request.employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A visa application has been requested for a request assigned to you, user:${req.user.username}`;
+  await createNotification(employee.id, message);
 
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 

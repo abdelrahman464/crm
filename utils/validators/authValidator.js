@@ -9,13 +9,13 @@ exports.signupValidator = [
     .isLength({ min: 2 })
     .withMessage("Username should be at least 2 characters")
     .isLength({ max: 100 })
-    .withMessage("Username should not exceed 100 characters")
-    .custom(async (val) => {
-      const user = await User.findOne({ where: { username: val } });
-      if (user) {
-        throw new Error("Username already in use");
-      }
-    }),
+    .withMessage("Username should not exceed 100 characters"),
+    // .custom(async (val) => {
+    //   const user = await User.findOne({ where: { username: val } });
+    //   if (user) {
+    //     throw new Error("Username already in use");
+    //   }
+    // }),
 
   check("email")
     .notEmpty()

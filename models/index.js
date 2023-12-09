@@ -86,4 +86,4 @@ db.sync({ force: false }).then(() => {
   console.log("Tables Created");
 });
 
-module.exports = { User, Bachelor, Master, PHD, RequestDoc };
+module.exports = { User, Bachelor, Master, PHD, RequestDoc , Notification };

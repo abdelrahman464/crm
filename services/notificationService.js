@@ -32,21 +32,9 @@ exports.getLoggedUserNotifications = asyncHandler(async (req, res, next) => {
 // });
 
 exports.deleteNotification = asyncHandler(async (req, res, next) => {
-  const  notificationId  = req.params.id;
-  const deletedRows = await Notification.destroy({
-    where: { id: notificationId },
-  });
-  if (deletedRows > 0) {
-    res
-      .status(200)
-      .json({ success: true, message: "Notification deleted successfully" });
-  } else {
-    res.status(404).json({ success: false, message: "Notification not found" });
-  }
-});
-// Mark a notification as read
-exports.markNotificationAsRead = asyncHandler(async (req, res, next) => {
-  const { notificationId } = req.params;
+  const notificationId = req.params.id;
+  const userId = req.user.id; // Assuming you can access the authenticated user's ID
+
   const notification = await Notification.findByPk(notificationId);
 
   if (!notification) {
@@ -55,7 +43,56 @@ exports.markNotificationAsRead = asyncHandler(async (req, res, next) => {
       .json({ success: false, message: "Notification not found" });
   }
 
-  notification.read = true;
+  // Check if the authenticated user is the owner of the notification
+  if (notification.UserId !== userId) {
+    return res
+      .status(403)
+      .json({
+        success: false,
+        message: "Not authorized to delete this notification",
+      });
+  }
+
+  // Delete the notification if the user is authorized
+  const deletedRows = await Notification.destroy({
+    where: { id: notificationId },
+  });
+
+  if (deletedRows > 0) {
+    return res
+      .status(200)
+      .json({ success: true, message: "Notification deleted successfully" });
+  }
+  return res
+    .status(404)
+    .json({ success: false, message: "Notification not found" });
+});
+
+// Mark a notification as read
+exports.markNotificationAsRead = asyncHandler(async (req, res, next) => {
+  const { notificationId } = req.params;
+  const userId = req.user.id;
+
+  // Find the notification by its ID
+  const notification = await Notification.findByPk(notificationId);
+
+  // Check if the notification exists
+  if (!notification) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Notification not found" });
+  }
+
+  // Check if the notification belongs to the authenticated user
+  if (notification.UserId !== userId) {
+    return res.status(403).json({
+      success: false,
+      message: "You are not authorized to mark this notification as read",
+    });
+  }
+
+  // Mark the notification as read
+  notification.isRead = true;
   await notification.save();
 
   res
@@ -63,14 +100,10 @@ exports.markNotificationAsRead = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Notification marked as read" });
 });
 
-
-
-exports.createNotification = async (req, res, next) => {
-  const { UserId, message } = req.params;
-
+exports.createNotification = async (UserId, message) => {
   const notification = await Notification.create({
     UserId,
     message,
   });
-  res.status(200).json({ success: true, data: notification });
+  return notification;
 };

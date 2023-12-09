@@ -3,6 +3,8 @@ const { Op } = require("sequelize");
 const { Master, Bachelor, PhD, User } = require("../models");
 const ApiError = require("../utils/apiError");
 
+
+
 exports.updateOne = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
@@ -133,11 +135,11 @@ exports.sendRequest = (Model, ModelName) =>
       };
     }
 
-    try {
-      console.log(`this is ${obj}`);
       const newRequest = await Model.create(obj);
-      console.log(`after this is ${obj}`);
 
+      if (!newRequest) {
+        return new ApiError(`Request not sent`, 404); 
+      }
       // Update User type
       await User.update(
         { type: ModelName },
@@ -145,14 +147,11 @@ exports.sendRequest = (Model, ModelName) =>
           where: { id: req.user.id },
         }
       );
-
+    
       return res
         .status(200)
         .json({ message: "Request sent successfully", request: newRequest });
-    } catch (error) {
-      console.error("Error sending request:", error);
-      return res.status(500).json({ error: "Failed to send request" });
-    }
+   
   });
 
 // update the request eligiblilty by admin

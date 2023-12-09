@@ -1,43 +1,25 @@
 const asyncHandler = require("express-async-handler");
 // const ApiError = require("../utils/apiError");
+const { createNotification } = require("./notificationService");
 const { User, Bachelor, Master, PHD } = require("../models");
 
 //1- assign employee for each request
 //@params     employeeId userId
 exports.assignEmployeeForRequest = asyncHandler(async (req, res) => {
   const { employeeId, userId, requestId } = req.body;
-  const user = await User.findByPk(userId);
 
-  let modelToUpdate;
-  if (user.type.toLowerCase() === "bachelor") {
-    modelToUpdate = Bachelor;
-  } else if (user.type.toLowerCase() === "master") {
-    modelToUpdate = Master;
-  } else if (user.type.toLowerCase() === "phd") {
-    modelToUpdate = PHD;
-  } else {
-    return res.status(400).json({ error: "Invalid user type" });
+  // Check if userId and requestId are present
+  if (!userId || !requestId) {
+    return res.status(400).json({ error: "Invalid userId or requestId" });
   }
-
-  if (modelToUpdate) {
-    await modelToUpdate.update(
-      { employeeId: employeeId },
-      { where: { id: requestId } }
-    );
-    // TODO: Save these assignments to the employee to view in their dashboard
-  }
-
-  return res.status(200).json({
-    status: "success",
-    msg: "Employee has been assigned successfully to this user",
-  });
-});
-
-exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
-  const { userId, requestId } = req.body;
 
   try {
     const user = await User.findByPk(userId);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     let modelToUpdate;
     if (user.type.toLowerCase() === "bachelor") {
@@ -51,11 +33,104 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
     }
 
     if (modelToUpdate) {
-      await modelToUpdate.update(
+      const request = await modelToUpdate.findOne({
+        where: { id: requestId, UserId: userId }, // Check if the request is related to the user
+      });
+
+      // Check if the request exists and is related to the user
+      if (!request) {
+        return res.status(404).json({ error: "Request not found or not related to this user" });
+      }
+
+      const [updatedRowCount] = await modelToUpdate.update(
+        { employeeId: employeeId },
+        { where: { id: requestId } }
+      );
+
+      if (updatedRowCount === 0) {
+        return res.status(404).json({ error: "Request not found" });
+      }
+
+      // Fetch the employee details
+      const employee = await User.findByPk(employeeId);
+
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+
+      // Create notification for the employee
+      const message = `You have been assigned to a new request (${user.type})`;
+      await createNotification(employee.id, message);
+    }
+
+    return res.status(200).json({
+      status: "success",
+      msg: "Employee has been assigned successfully to this user",
+    });
+  } catch (error) {
+    console.error("Error assigning employee to request:", error);
+    return res.status(500).json({ error: "Failed to assign employee to request" });
+  }
+});
+
+
+
+exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
+  const { userId, requestId } = req.body;
+
+  // Check if userId and requestId are present
+  if (!userId || !requestId) {
+    return res.status(400).json({ error: "Invalid userId or requestId" });
+  }
+
+  try {
+    const user = await User.findByPk(userId);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    let modelToUpdate;
+    if (user.type.toLowerCase() === "bachelor") {
+      modelToUpdate = Bachelor;
+    } else if (user.type.toLowerCase() === "master") {
+      modelToUpdate = Master;
+    } else if (user.type.toLowerCase() === "phd") {
+      modelToUpdate = PHD;
+    } else {
+      return res.status(400).json({ error: "Invalid user type" });
+    }
+
+    if (modelToUpdate) {
+      const request = await modelToUpdate.findOne({
+        where: { id: requestId, UserId: userId }, // Check if the request is related to the user
+      });
+
+      // Check if the request exists and is related to the user
+      if (!request) {
+        return res.status(404).json({ error: "Request not found or not related to this user" });
+      }
+
+      const [updatedRowCount] = await modelToUpdate.update(
         { employeeId: null },
         { where: { id: requestId } }
       );
-      // TODO: Save these assignments to the employee to view in their dashboard
+
+      if (updatedRowCount === 0) {
+        return res.status(404).json({ error: "Request not found" });
+      }
+
+      // Fetch the employee details
+      const employee = await User.findByPk(user.employeeId);
+
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+
+      // Create notification for the employee
+      const message = `Your assignment has been removed from a request (${user.type})`;
+      await createNotification(employee.id, message);
     }
 
     return res.status(200).json({
@@ -64,9 +139,7 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error removing employee assignment:", error);
-    return res
-      .status(500)
-      .json({ error: "Failed to remove employee assignment" });
+    return res.status(500).json({ error: "Failed to remove employee assignment" });
   }
 });
 
