@@ -52,7 +52,7 @@ exports.getAll = (Model, modelName) =>
     const searchQuery = req.query.keyword; // Assuming the search term is passed in the 'keyword' query parameter
 
     let filter = { ...req.filterObj };
-    console.log("Filter:", filter);
+    
 
     if (searchQuery) {
       let searchFilter;

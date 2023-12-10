@@ -103,3 +103,10 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ data: updatedUser });
 });
+//@desc get all employees
+//@route PUT /api/v1/user/employees
+//@access private/protect admin
+exports.getAllEmployee = asyncHandler(async (req, res) => {
+  const documents = await User.findAll({ where: { role: "employee" } });
+  res.status(200).json({ success: true, data: documents });
+});

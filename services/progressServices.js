@@ -118,7 +118,13 @@ exports.nextStep = (requestName, stepName, Model) =>
     if (!request) {
       return next(new ApiError(`Document Not Found`, 404));
     }
-
+    // Check if the associated user exists
+    const requestEmployee = await User.findByPk(request.employeeId);
+    if (!requestEmployee) {
+      return next(
+        new ApiError(`you are not allowed to access this route`, 401)
+      );
+    }
     // Check if the associated user exists
     const user = await User.findByPk(request.UserId);
     if (!user) {
@@ -991,3 +997,6 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
 });
 
 //------------------------------------------------------------------------------------end step 8 --------------------------------------------
+
+//TODO
+//check request eligibilty before start in progress service

@@ -8,6 +8,13 @@ const { User, Bachelor, Master, PHD } = require("../models");
 exports.assignEmployeeForRequest = asyncHandler(async (req, res) => {
   const { employeeId, userId, requestId } = req.body;
 
+  const currentEmployee = await User.findByPk(employeeId);
+  if (!currentEmployee.role === "employee") {
+    return res
+      .status(400)
+      .json({ error: "this is not employee to assign to request" });
+  }
+
   // Check if userId and requestId are present
   if (!userId || !requestId) {
     return res.status(400).json({ error: "Invalid userId or requestId" });
@@ -39,7 +46,9 @@ exports.assignEmployeeForRequest = asyncHandler(async (req, res) => {
 
       // Check if the request exists and is related to the user
       if (!request) {
-        return res.status(404).json({ error: "Request not found or not related to this user" });
+        return res
+          .status(404)
+          .json({ error: "Request not found or not related to this user" });
       }
 
       const [updatedRowCount] = await modelToUpdate.update(
@@ -69,11 +78,11 @@ exports.assignEmployeeForRequest = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error assigning employee to request:", error);
-    return res.status(500).json({ error: "Failed to assign employee to request" });
+    return res
+      .status(500)
+      .json({ error: "Failed to assign employee to request" });
   }
 });
-
-
 
 exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
   const { userId, requestId } = req.body;
@@ -109,7 +118,9 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
 
       // Check if the request exists and is related to the user
       if (!request) {
-        return res.status(404).json({ error: "Request not found or not related to this user" });
+        return res
+          .status(404)
+          .json({ error: "Request not found or not related to this user" });
       }
 
       const [updatedRowCount] = await modelToUpdate.update(
@@ -139,7 +150,9 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error removing employee assignment:", error);
-    return res.status(500).json({ error: "Failed to remove employee assignment" });
+    return res
+      .status(500)
+      .json({ error: "Failed to remove employee assignment" });
   }
 });
 

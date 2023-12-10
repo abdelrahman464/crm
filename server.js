@@ -7,8 +7,6 @@ const dotenv = require("dotenv");
 // const mysql2 = require("mysql2");
 dotenv.config({ path: "config.env" });
 
-
-
 //route
 const mountRoutes = require("./routes");
 
@@ -49,7 +47,6 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(globalError);
-
 
 const PORT = process.env.PORT || 8000;
 const server = app.listen(PORT, () => {

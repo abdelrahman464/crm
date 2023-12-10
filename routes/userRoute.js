@@ -14,10 +14,14 @@ const {
   updateLoggedUserData,
   updateLoggedUserPassword,
   getLoggedUserData,
+  getAllEmployee,
 } = require("../services/userServices");
 const authServices = require("../services/authServices");
 
 const router = express.Router();
+router
+  .route("/employees")
+  .get(authServices.protect, authServices.allowedTo("admin"), getAllEmployee);
 router.get("/getMe", authServices.protect, getLoggedUserData, getUserById);
 router.put(
   "/changeMyPassword",
