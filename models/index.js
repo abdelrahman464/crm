@@ -18,7 +18,6 @@ const RequestDocumentModel = require("./RequestDocument");
 const OrderModel = require("./order");
 const NotificationModel = require("./Notification");
 
-
 //createa models
 const User = UserModel(db, Sequelize);
 const Bachelor = BachelorModel(db, Sequelize);
@@ -31,13 +30,13 @@ const Notification = NotificationModel(db, Sequelize);
 //define relationships
 //User & Bachelor => relationships (one to many)
 User.hasMany(Bachelor, { as: "Bachelor" });
-Bachelor.belongsTo(User);
+Bachelor.belongsTo(User, { foreignKey: "UserId", as: "UserDetails" });
 //User & Master => relationships (one to many)
 User.hasMany(Master, { as: "Master" });
-Master.belongsTo(User);
+Master.belongsTo(User, { foreignKey: "UserId", as: "UserDetails" });
 //User & PHD => relationships (one to many)
 User.hasMany(PHD, { as: "PHD" });
-PHD.belongsTo(User);
+PHD.belongsTo(User, { foreignKey: "UserId", as: "UserDetails" });
 
 User.hasMany(Bachelor, { as: "ManageBachelors", foreignKey: "employeeId" });
 Bachelor.belongsTo(User, { as: "Employee", foreignKey: "employeeId" });
@@ -60,15 +59,24 @@ Order.belongsTo(PHD, { as: "PRequests", foreignKey: "requstId" });
 
 // Create one-to-one relationship between RequestDoc and Bachelor
 RequestDoc.hasOne(Bachelor, { foreignKey: "requestDocId" });
-Bachelor.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
+Bachelor.belongsTo(RequestDoc, {
+  foreignKey: "requestDocId",
+  as: "RequestDocumentDetails",
+});
 
 // Create one-to-one relationship between RequestDoc and Master
 RequestDoc.hasOne(Master, { foreignKey: "requestDocId" });
-Master.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
+Master.belongsTo(RequestDoc, {
+  foreignKey: "requestDocId",
+  as: "RequestDocumentDetails",
+});
 
 // Create one-to-one relationship between RequestDoc and PHD
 RequestDoc.hasOne(PHD, { foreignKey: "requestDocId" });
-PHD.belongsTo(RequestDoc, { foreignKey: "requestDocId" });
+PHD.belongsTo(RequestDoc, {
+  foreignKey: "requestDocId",
+  as: "RequestDocumentDetails",
+});
 
 //for user and order
 User.hasMany(Order, { as: "userOrders", foreignKey: "UserId" });
@@ -76,14 +84,12 @@ Order.belongsTo(User, { as: "userOrders", foreignKey: "UserId" });
 // ... (the rest of your code)
 
 // relationship between User and Notification
-User.hasMany(Notification, { foreignKey: 'UserId', as: 'notifications' });
-Notification.belongsTo(User, { foreignKey: 'UserId' });
-
-
+User.hasMany(Notification, { foreignKey: "UserId", as: "notifications" });
+Notification.belongsTo(User, { foreignKey: "UserId", as: "UserNotification" });
 
 //generate tables in DB
 db.sync({ force: false }).then(() => {
   console.log("Tables Created");
 });
 
-module.exports = { User, Bachelor, Master, PHD, RequestDoc , Notification };
+module.exports = { User, Bachelor, Master, PHD, RequestDoc, Notification };

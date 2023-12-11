@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
-const { Bachelor } = require("../models");
+const { Bachelor, User } = require("../models");
 const { nextStep } = require("./progressServices");
 const ApiError = require("../utils/apiError");
 const {
@@ -10,6 +10,7 @@ const {
   getOne,
   getAll,
   deleteOne,
+  checkAuthorityRequest,
 } = require("./handlerFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
@@ -106,14 +107,66 @@ exports.resize = asyncHandler(async (req, res, next) => {
 // send  Bachelor Request
 exports.sendBachelorRequest = sendRequest(Bachelor, "Bachelor");
 
+//check If The User Or Employ That Can get
+exports.checkAuthorityRequestBachelor = checkAuthorityRequest(Bachelor);
 // Get One Bachelor
-exports.getBachelorById = getOne(Bachelor);
+exports.getBachelorById = getOne(Bachelor, [
+  {
+    model: User,
+    as: "UserDetails",
+  },
+  {
+    model: User,
+    as: "Employee",
+  },
+]);
 
 // update request (eligible or not eligible)
-exports.updateBachelorRequest = updateRequestEligibility(Bachelor);
+exports.updateBachelorRequestEligibility = updateRequestEligibility(Bachelor);
 
+//update Bachelor by user that have made the request
+exports.updateBachelorByUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const [affectedRowCount] = await Bachelor.update(
+    {
+      Passport: req.body.Passport,
+      PersonalPicture: req.body.PersonalPicture,
+      HighSchoolCertificate: req.body.HighSchoolCertificate,
+      CV: req.body.CV,
+      PersonalStatement: req.body.PersonalStatement,
+      CountryOfStudy: req.body.CountryOfStudy,
+      RequiredSpecialization: req.body.RequiredSpecialization,
+    },
+    {
+      where: { id },
+    }
+  );
+
+  if (affectedRowCount === 0) {
+    return next(new ApiError(`Document Not Found`, 404));
+  }
+
+  // Fetch the updated document after the update
+  const updatedDocument = await Bachelor.findByPk(id);
+
+  if (!updatedDocument) {
+    return next(new ApiError(`Document Not Found`, 404));
+  }
+
+  const updatedData = updatedDocument.get();
+  res.status(200).json({ data: updatedData });
+});
 // Get All Bachelors
-exports.getAllBachelors = getAll(Bachelor, "Bachelor");
+exports.getAllBachelors = getAll(Bachelor, "Bachelor", [
+  {
+    model: User,
+    as: "UserDetails",
+  },
+  {
+    model: User,
+    as: "Employee",
+  },
+]);
 
 // Delete One Bachelor
 exports.deleteBachelor = deleteOne(Bachelor);
@@ -138,8 +191,11 @@ exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
   "get_copy_of_mohere",
   Bachelor
 );
-exports.goToNextStepAftergetCopyOfMohere = nextStep("Bachelor", "visa_fees",
-Bachelor);
+exports.goToNextStepAftergetCopyOfMohere = nextStep(
+  "Bachelor",
+  "visa_fees",
+  Bachelor
+);
 exports.goToNextStepAftervisaFees = nextStep(
   "Bachelor",
   "getting_EMGS_approval",

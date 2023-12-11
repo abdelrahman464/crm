@@ -3,8 +3,6 @@ const { Op } = require("sequelize");
 const { Master, Bachelor, PhD, User } = require("../models");
 const ApiError = require("../utils/apiError");
 
-
-
 exports.updateOne = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
@@ -33,10 +31,10 @@ exports.createOne = (Model) =>
     res.status(201).json({ data: document });
   });
 
-exports.getOne = (Model) =>
+exports.getOne = (Model, include) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const query = { where: { id } };
+    const query = { where: { id }, include };
 
     const document = await Model.findOne(query);
 
@@ -47,12 +45,11 @@ exports.getOne = (Model) =>
     res.status(200).json({ data: document });
   });
 
-exports.getAll = (Model, modelName) =>
+exports.getAll = (Model, modelName, include) =>
   asyncHandler(async (req, res) => {
     const searchQuery = req.query.keyword; // Assuming the search term is passed in the 'keyword' query parameter
 
     let filter = { ...req.filterObj };
-    
 
     if (searchQuery) {
       let searchFilter;
@@ -71,7 +68,7 @@ exports.getAll = (Model, modelName) =>
       filter = { ...filter, ...searchFilter }; // Merge the existing filter with the search filter
     }
 
-    const documents = await Model.findAll({ where: filter });
+    const documents = await Model.findAll({ where: filter, include });
     res.status(200).json({ data: documents });
   });
 
@@ -99,6 +96,8 @@ exports.sendRequest = (Model, ModelName) =>
         HighSchoolCertificate: req.body.HighSchoolCertificate,
         CV: req.body.CV,
         PersonalStatement: req.body.PersonalStatement,
+        CountryOfStudy: req.body.CountryOfStudy,
+        RequiredSpecialization: req.body.RequiredSpecialization,
       };
     }
     if (ModelName === "Master") {
@@ -115,6 +114,8 @@ exports.sendRequest = (Model, ModelName) =>
         ExperienceLetter: req.body.ExperienceLetter,
         PersonalStatement: req.body.PersonalStatement,
         ResearchProposal: req.body.ResearchProposal,
+        CountryOfStudy: req.body.CountryOfStudy,
+        RequiredSpecialization: req.body.RequiredSpecialization,
       };
     }
     if (ModelName === "PHD") {
@@ -132,26 +133,27 @@ exports.sendRequest = (Model, ModelName) =>
         ExperienceLetter: req.body.ExperienceLetter,
         PersonalStatement: req.body.PersonalStatement,
         ResearchProposal: req.body.ResearchProposal,
+        CountryOfStudy: req.body.CountryOfStudy,
+        RequiredSpecialization: req.body.RequiredSpecialization,
       };
     }
 
-      const newRequest = await Model.create(obj);
+    const newRequest = await Model.create(obj);
 
-      if (!newRequest) {
-        return new ApiError(`Request not sent`, 404); 
+    if (!newRequest) {
+      return new ApiError(`Request not sent`, 404);
+    }
+    // Update User type
+    await User.update(
+      { type: ModelName },
+      {
+        where: { id: req.user.id },
       }
-      // Update User type
-      await User.update(
-        { type: ModelName },
-        {
-          where: { id: req.user.id },
-        }
-      );
-    
-      return res
-        .status(200)
-        .json({ message: "Request sent successfully", request: newRequest });
-   
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Request sent successfully", request: newRequest });
   });
 
 // update the request eligiblilty by admin
@@ -254,6 +256,35 @@ exports.filterRequests = asyncHandler(async (req, res, next) => {
     };
   }
   req.filterObj = filterObject;
-  console.log("filterObject:", filterObject); // Add this log statement
   next();
 });
+//check If The User Or Employ That Can get
+exports.checkAuthorityRequest = (Model) =>
+  asyncHandler(async (req, res, next) => {
+    //if admin skip to next middlware
+    if (req.user.role === "admin") {
+      next();
+    }
+    //get model by id
+    const { id } = req.params;
+    const query = { where: { id } };
+
+    const document = await Model.findOne(query);
+
+    //if employee check if the employee is the one that has been assigned to the request
+    if (req.user.role === "employee") {
+      if (document.EmployeeId !== req.user.id) {
+        return next(
+          new ApiError(`You are not allowed to get this document`, 403)
+        );
+      }
+    }
+    //if user check if the user is the one that has been created the request
+    else if (req.user.role === "user") {
+      if (document.UserId !== req.user.id) {
+        return next(
+          new ApiError(`You are not allowed to get this document`, 403)
+        );
+      }
+    }
+  });

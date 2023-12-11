@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
-const { PhD } = require("../models");
+const { PHD, User } = require("../models");
 const { nextStep } = require("./progressServices");
 const ApiError = require("../utils/apiError");
 const {
@@ -10,6 +10,7 @@ const {
   getOne,
   getAll,
   deleteOne,
+  checkAuthorityRequest
 } = require("./handlerFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
@@ -184,49 +185,122 @@ exports.resize = asyncHandler(async (req, res, next) => {
 });
 
 // send PhD Request
-exports.sendBPhdRequest = sendRequest(PhD, "PhD");
+exports.sendBPhdRequest = sendRequest(PHD, "PHD");
+//check If The User Or Employ That Can get
+exports.checkAuthorityRequestPHD = checkAuthorityRequest(PHD);
 // Get One PhD
-exports.getPhDById = getOne(PhD);
+exports.getPhDById = getOne(PHD, [
+  {
+    model: User,
+    as: "UserDetails",
+  },
+  {
+    model: User,
+    as: "Employee",
+  }
+]);
 
 // update request (eligible or not eligible)
-exports.updatePhDRequest = updateRequestEligibility(PhD);
+exports.updatePhDRequestEligibility = updateRequestEligibility(PHD);
 // Get All PhD
-exports.getAllPhDs = getAll(PhD, "PhD");
+exports.getAllPhDs = getAll(PHD, "PHD", [
+  {
+    model: User,
+    as: "UserDetails",
+  },
+  {
+    model: User,
+    as: "Employee",
+  }
+]);
 
+//update PHD by user that have made the request
+exports.updatePHDByUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const [affectedRowCount] = await PHD.update(
+    {
+      Passport: req.body.Passport,
+      PersonalPicture: req.body.PersonalPicture,
+      CV: req.body.CV,
+      BachelorsDegreeCertificateWithTranscript:
+        req.body.BachelorsDegreeCertificateWithTranscript,
+      MastersDegreeCertificateWithTranscript:
+        req.body.MastersDegreeCertificateWithTranscript,
+      EnglishTestResults: req.body.EnglishTestResults,
+      TwoRecommendationLetters: req.body.TwoRecommendationLetters,
+      ExperienceLetter: req.body.ExperienceLetter,
+      PersonalStatement: req.body.PersonalStatement,
+      ResearchProposal: req.body.ResearchProposal,
+      CountryOfStudy: req.body.CountryOfStudy,
+      RequiredSpecialization: req.body.RequiredSpecialization,
+    },
+    {
+      where: { id },
+    }
+  );
+
+  if (affectedRowCount === 0) {
+    return next(new ApiError(`Document Not Found`, 404));
+  }
+
+  // Fetch the updated document after the update
+  const updatedDocument = await PHD.findByPk(id);
+
+  if (!updatedDocument) {
+    return next(new ApiError(`Document Not Found`, 404));
+  }
+
+  const updatedData = updatedDocument.get();
+  res.status(200).json({ data: updatedData });
+});
 // Delete One PhD
-exports.deletePhD = deleteOne(PhD);
+exports.deletePhD = deleteOne(PHD);
 
-exports.goToNextStepAftersignContract = nextStep("PhD", "contract_fees");
+exports.goToNextStepAftersignContract = nextStep("PHD", "contract_fees", PHD);
 
-exports.goToNextStepAftersignContract = nextStep("PhD", "contract_fees");
-exports.goToNextStepAftercontractFees = nextStep("PhD", "sending_offerLetter");
+exports.goToNextStepAftercontractFees = nextStep(
+  "PHD",
+  "sending_offerLetter",
+  PHD
+);
 exports.goToNextStepAftersendingOfferLetter = nextStep(
-  "PhD",
-  "deliver_and_sign_offerLetter"
+  "PHD",
+  "deliver_and_sign_offerLetter",
+  PHD
 );
 exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
-  "PhD",
-  "get_copy_of_mohere"
+  "PHD",
+  "get_copy_of_mohere",
+  PHD
 );
-exports.goToNextStepAftergetCopyOfMohere = nextStep("PhD", "visa_fees");
-exports.goToNextStepAftervisaFees = nextStep("PhD", "getting_EMGS_approval");
+exports.goToNextStepAftergetCopyOfMohere = nextStep("PHD", "visa_fees", PHD);
+exports.goToNextStepAftervisaFees = nextStep(
+  "PHD",
+  "getting_EMGS_approval",
+  PHD
+);
 exports.goToNextStepAftergettingEMGSApproval = nextStep(
-  "PhD",
-  "registration_fees"
+  "PHD",
+  "registration_fees",
+  PHD
 );
 exports.goToNextStepAfterregistrationFees = nextStep(
-  "PhD",
-  "getting_final_acceptance_letter"
+  "PHD",
+  "getting_final_acceptance_letter",
+  PHD
 );
 exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
-  "PhD",
-  "recieving_ticket_copy"
+  "PHD",
+  "recieving_ticket_copy",
+  PHD
 );
 exports.goToNextStepAfterrecievingTicketCopy = nextStep(
-  "PhD",
-  "applying_for_visa"
+  "PHD",
+  "applying_for_visa",
+  PHD
 );
 exports.goToNextStepAfterapplyingForVisa = nextStep(
-  "PhD",
-  "arranging_airport_pickup"
+  "PHD",
+  "arranging_airport_pickup",
+  PHD
 );

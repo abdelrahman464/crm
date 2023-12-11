@@ -7,9 +7,11 @@ const {
 } = require("../services/handlerFactory");
 const {
   getAllBachelors,
+  checkAuthorityRequestBachelor,
   getBachelorById,
   sendBachelorRequest,
-  updateBachelorRequest,
+  updateBachelorRequestEligibility,
+  updateBachelorByUser,
   deleteBachelor,
   uploads,
   resize,
@@ -39,12 +41,20 @@ router
     resize,
     sendBachelorRequest
   );
-router.route("/:id").delete(protect, allowedTo("admin"), deleteBachelor).get(
-  protect,
-  allowedTo("admin", "user"), // we need validation to user that make the request who get it
-  getBachelorById
-);
-router.route("/:id").post(protect, allowedTo("admin"), updateBachelorRequest);
+router
+  .route("/:id")
+  .delete(protect, allowedTo("admin"), deleteBachelor)
+  .get(
+    protect,
+    allowedTo("admin", "user", "employee"), // we need validation to user that make the request who get it
+    checkAuthorityRequestBachelor,
+    getBachelorById
+  )
+  .put(protect, allowedTo("user"), uploads, resize, updateBachelorByUser);
+
+router
+  .route("/:id/eligibility")
+  .put(protect, allowedTo("admin"), updateBachelorRequestEligibility);
 
 router
   .route("/goToNextStepAfterapplyingForVisa/:id")

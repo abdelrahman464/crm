@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
-const { Master } = require("../models");
+const { Master, User } = require("../models");
 const { nextStep } = require("./progressServices");
 const ApiError = require("../utils/apiError");
 const {
@@ -10,6 +10,7 @@ const {
   getOne,
   getAll,
   deleteOne,
+  checkAuthorityRequest,
 } = require("./handlerFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
@@ -182,51 +183,128 @@ exports.resize = asyncHandler(async (req, res, next) => {
 
 // send Bachelor Request
 exports.sendMasterRequest = sendRequest(Master, "Master");
-
+//check If The User Or Employ That Can get
+exports.checkAuthorityRequestMaster = checkAuthorityRequest(Master);
 // Get One Bachelor
-exports.getMasterById = getOne(Master);
+exports.getMasterById = getOne(Master, [
+  {
+    model: User,
+    as: "UserDetails",
+  },
+  {
+    model: User,
+    as: "Employee",
+  }
+]);
 
 // update request (eligible or not eligible)
-exports.updateMasterRequest = updateRequestEligibility(Master);
+exports.updateMasterRequestEligibility = updateRequestEligibility(Master);
 
 // Get All Bachelors
-exports.getAllMasters = getAll(Master, "Master");
+exports.getAllMasters = getAll(Master, "Master", [
+  {
+    model: User,
+    as: "UserDetails",
+  },
+  {
+    model: User,
+    as: "Employee",
+  }
+]);
 
+//update Master by user that have made the request
+exports.updateMasterByUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const [affectedRowCount] = await Master.update(
+    {
+      Passport: req.body.Passport,
+      PersonalPicture: req.body.PersonalPicture,
+      CV: req.body.CV,
+      HighSchoolCertificate: req.body.HighSchoolCertificate,
+      BachelorsDegreeCertificateWithTranscript:
+        req.body.BachelorsDegreeCertificateWithTranscript,
+      EnglishTestResults: req.body.EnglishTestResults,
+      TwoRecommendationLetters: req.body.TwoRecommendationLetters,
+      ExperienceLetter: req.body.ExperienceLetter,
+      PersonalStatement: req.body.PersonalStatement,
+      ResearchProposal: req.body.ResearchProposal,
+      CountryOfStudy: req.body.CountryOfStudy,
+      RequiredSpecialization: req.body.RequiredSpecialization,
+    },
+    {
+      where: { id },
+    }
+  );
+
+  if (affectedRowCount === 0) {
+    return next(new ApiError(`Document Not Found`, 404));
+  }
+
+  // Fetch the updated document after the update
+  const updatedDocument = await Master.findByPk(id);
+
+  if (!updatedDocument) {
+    return next(new ApiError(`Document Not Found`, 404));
+  }
+
+  const updatedData = updatedDocument.get();
+  res.status(200).json({ data: updatedData });
+});
 // Delete One Bachelor
 exports.deleteMaster = deleteOne(Master);
 
-exports.goToNextStepAftersignContract = nextStep("Master", "contract_fees");
+exports.goToNextStepAftersignContract = nextStep(
+  "Master",
+  "contract_fees",
+  Master
+);
 exports.goToNextStepAftercontractFees = nextStep(
   "Master",
-  "sending_offerLetter"
+  "sending_offerLetter",
+  Master
 );
 exports.goToNextStepAftersendingOfferLetter = nextStep(
   "Master",
-  "deliver_and_sign_offerLetter"
+  "deliver_and_sign_offerLetter",
+  Master
 );
 exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
   "Master",
-  "get_copy_of_mohere"
+  "get_copy_of_mohere",
+  Master
 );
-exports.goToNextStepAftergetCopyOfMohere = nextStep("Master", "visa_fees");
-exports.goToNextStepAftervisaFees = nextStep("Master", "getting_EMGS_approval");
+exports.goToNextStepAftergetCopyOfMohere = nextStep(
+  "Master",
+  "visa_fees",
+  Master
+);
+exports.goToNextStepAftervisaFees = nextStep(
+  "Master",
+  "getting_EMGS_approval",
+  Master
+);
 exports.goToNextStepAftergettingEMGSApproval = nextStep(
   "Master",
-  "registration_fees"
+  "registration_fees",
+  Master
 );
 exports.goToNextStepAfterregistrationFees = nextStep(
   "Master",
-  "getting_final_acceptance_letter"
+  "getting_final_acceptance_letter",
+  Master
 );
 exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
   "Master",
-  "recieving_ticket_copy"
+  "recieving_ticket_copy",
+  Master
 );
 exports.goToNextStepAfterrecievingTicketCopy = nextStep(
   "Master",
-  "applying_for_visa"
+  "applying_for_visa",
+  Master
 );
 exports.goToNextStepAfterapplyingForVisa = nextStep(
   "Master",
-  "arranging_airport_pickup"
+  "arranging_airport_pickup",
+  Master
 );

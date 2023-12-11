@@ -7,9 +7,13 @@ const {
 } = require("../services/handlerFactory");
 const {
   getAllPhDs,
+  checkAuthorityRequestPHD,
   getPhDById,
   sendBPhdRequest,
-  updatePhDRequest,
+  updatePHDByUser,
+  uploads,
+  resize,
+  updatePhDRequestEligibility,
   deletePhD,
   goToNextStepAfterapplyingForVisa,
   goToNextStepAftercontractFees,
@@ -29,16 +33,30 @@ const router = express.Router();
 router
   .route("/")
   .get(protect, filterRequests, getAllPhDs)
-  .post(protect, allowedTo("user"), canSendRequest, sendBPhdRequest);
+  .post(
+    protect,
+    allowedTo("user"),
+    canSendRequest,
+    uploads,
+    resize,
+    sendBPhdRequest
+  );
 router
   .route("/:id")
   .delete(protect, allowedTo("admin"), deletePhD)
   .get(
     protect,
-    allowedTo("admin", "user"), // we need validation to user that make the request who get it
+    allowedTo("admin", "user", "employee"), // we need validation to user that make the request who get it
+    checkAuthorityRequestPHD,
     getPhDById
   )
-  .put(protect, allowedTo("admin"), updatePhDRequest);
+  .put(protect, allowedTo("user"), uploads, resize, updatePHDByUser);
+//elgibility
+router
+  .route("/:id/eligibility")
+  .put(protect, allowedTo("admin"), updatePhDRequestEligibility);
+
+//steps
 router
   .route("/goToNextStepAfterapplyingForVisa")
   .post(protect, allowedTo("employee"), goToNextStepAfterapplyingForVisa);

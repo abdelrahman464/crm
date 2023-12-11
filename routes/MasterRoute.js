@@ -9,8 +9,10 @@ const {
   uploads,
   resize,
   getAllMasters,
+  checkAuthorityRequestMaster,
   getMasterById,
-  updateMasterRequest,
+  updateMasterByUser,
+  updateMasterRequestEligibility,
   sendMasterRequest,
   deleteMaster,
   goToNextStepAfterapplyingForVisa,
@@ -44,10 +46,18 @@ router
   .delete(protect, allowedTo("admin"), deleteMaster)
   .get(
     protect,
-    allowedTo("admin", "user"), // we need validation to user that make the request who get it
+    allowedTo("admin", "user", "employee"), // we need validation to user that make the request who get it
+    checkAuthorityRequestMaster,
     getMasterById
   )
-  .put(protect, allowedTo("admin", "employee"), updateMasterRequest);
+  .put(protect, allowedTo("user"), uploads, resize, updateMasterByUser);
+
+//requset eligibility
+router
+  .route("/:id/eligibility")
+  .put(protect, allowedTo("admin"), updateMasterRequestEligibility);
+
+//steps
 router
   .route("/goToNextStepAfterapplyingForVisa")
   .post(protect, allowedTo("employee"), goToNextStepAfterapplyingForVisa);

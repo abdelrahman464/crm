@@ -10,7 +10,7 @@ module.exports = (db, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      // unique: true,
     },
     email: {
       type: DataTypes.STRING,
