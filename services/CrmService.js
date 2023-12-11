@@ -171,7 +171,7 @@ exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
   const masterRequests = await Master.findAll({
     where: { employeeId },
   });
-  console.log("masterRequests", masterRequests);
+
   const phdRequests = await PHD.findAll({
     where: { employeeId },
   });
@@ -180,3 +180,4 @@ exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ data: allRequests });
 });
+

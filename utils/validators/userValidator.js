@@ -10,14 +10,14 @@ exports.createUserValidator = [
     .isLength({ min: 2 })
     .withMessage("too short User name")
     .isLength({ max: 100 })
-    .withMessage("too long User name")
-    .custom((val) =>
-      User.findOne({ username: val }).then((user) => {
-        if (user.dataValues.username === val) {
-          return Promise.reject(new Error("username already in use"));
-        }
-      })
-    ),
+    .withMessage("too long User name"),
+  // .custom((val) =>
+  //   User.findOne({ username: val }).then((user) => {
+  //     if (user.dataValues.username === val) {
+  //       return Promise.reject(new Error("username already in use"));
+  //     }
+  //   })
+  // )
   check("email")
     .notEmpty()
     .withMessage("Email required")
