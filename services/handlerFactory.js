@@ -273,7 +273,7 @@ exports.checkAuthorityRequest = (Model) =>
 
     //if employee check if the employee is the one that has been assigned to the request
     if (req.user.role === "employee") {
-      if (document.EmployeeId !== req.user.id) {
+      if (document.employeeId !== req.user.id) {
         return next(
           new ApiError(`You are not allowed to get this document`, 403)
         );
@@ -288,3 +288,27 @@ exports.checkAuthorityRequest = (Model) =>
       }
     }
   });
+
+// exports.updateRequstPrice = (Model) =>
+// asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const [affectedRowCount] = await Model.update({}, {
+//     where: { id },
+//   });
+
+//   if (affectedRowCount === 0) {
+//     return next(new ApiError(`Document Not Found`, 404));
+//   }
+
+//   // Fetch the updated document after the update
+//   const updatedDocument = await Model.findByPk(id);
+
+//   if (!updatedDocument) {
+//     return next(new ApiError(`Document Not Found`, 404));
+//   }
+
+//   const updatedData = updatedDocument.get();
+//   res.status(200).json({ data: updatedData });
+// });
+
+

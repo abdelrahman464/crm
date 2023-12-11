@@ -217,6 +217,24 @@ exports.getAllPhDs = getAll(PHD, "PHD", [
 //update PHD by user that have made the request
 exports.updatePHDByUser = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
+  const loggedInUserId = req.user.id; // Get the ID of the logged-in user
+
+  // Find the request by ID and include the associated user
+  const request = await PHD.findByPk(id);
+
+  if (!request) {
+    return next(new ApiError(`Request Not Found`, 404));
+  }
+
+  // Check if the logged-in user ID matches the UserID associated with the request
+  if (request.UserId !== loggedInUserId) {
+    return next(
+      new ApiError(
+        `Unauthorized. User does not have permission to update this request.`,
+        403
+      )
+    );
+  }
   const [affectedRowCount] = await PHD.update(
     {
       Passport: req.body.Passport,
