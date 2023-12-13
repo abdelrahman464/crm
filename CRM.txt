@@ -19,6 +19,7 @@ plan
 //----  end 
 
 //---- optimize routes 
+commit 13 dec
   1- send request with (currentStatus , type , requestId )
   2- make middleware that check currentStatus if in [1,2,3]  validate that he send price key  
 
@@ -34,7 +35,7 @@ plan
 
   
   make middleware to -->  1-create order when it require and fees           
-
+//---------------
 
 
 

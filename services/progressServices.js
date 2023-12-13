@@ -273,7 +273,7 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
       modelToUpdate = Master;
       break;
     case "phd":
-      modelToUpdate = PhD;
+      modelToUpdate = PHD;
       break;
     default:
       return next(new ApiError(`Invalid request type`, 400));
@@ -545,7 +545,7 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
       requestModel = Master;
       break;
     case "PhD":
-      requestModel = PhD;
+      requestModel = PHD;
       break;
     default:
       return next(new ApiError(`Invalid request type`, 400));
@@ -625,7 +625,7 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
       requestModel = Master;
       break;
     case "PhD":
-      requestModel = PhD;
+      requestModel = PHD;
       break;
     default:
       return next(new ApiError(`Invalid request type`, 400));
@@ -699,7 +699,7 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
       requestModel = Master;
       break;
     case "PhD":
-      requestModel = PhD;
+      requestModel = PHD;
       break;
     default:
       return next(new ApiError(`Invalid request type`, 400));
@@ -777,7 +777,7 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
       requestModel = Master;
       break;
     case "PhD":
-      requestModel = PhD;
+      requestModel = PHD;
       break;
     default:
       return next(new ApiError(`Invalid request type`, 400));
@@ -849,7 +849,7 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
       requestModel = Master;
       break;
     case "PhD":
-      requestModel = PhD;
+      requestModel = PHD;
       break;
     default:
       return next(new ApiError(`Invalid request type`, 400));
