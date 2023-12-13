@@ -79,6 +79,6 @@ router.post(
   webhookCheckoutPayFees
 );
 
-router.put("/checkoutSession", protect, checkoutSessionToPayFees);
+router.put("/checkoutSession/:requestId", protect, checkoutSessionToPayFees);
 
 module.exports = router;

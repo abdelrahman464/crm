@@ -2,7 +2,6 @@ const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const { PHD, User } = require("../models");
-const { nextStep } = require("./progressServices");
 const ApiError = require("../utils/apiError");
 const {
   sendRequest,
@@ -276,51 +275,3 @@ exports.deletePhD = deleteOne(PHD);
 
 
 
-// exports.moveToNextStepPHd = nextStep(PHD);
-
-// exports.goToNextStepAftercontractFees = nextStep(
-//   "PHD",
-//   "sending_offerLetter",
-//   PHD
-// );
-// exports.goToNextStepAftersendingOfferLetter = nextStep(
-//   "PHD",
-//   "deliver_and_sign_offerLetter",
-//   PHD
-// );
-// exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
-//   "PHD",
-//   "get_copy_of_mohere",
-//   PHD
-// );
-// exports.goToNextStepAftergetCopyOfMohere = nextStep("PHD", "visa_fees", PHD);
-// exports.goToNextStepAftervisaFees = nextStep(
-//   "PHD",
-//   "getting_EMGS_approval",
-//   PHD
-// );
-// exports.goToNextStepAftergettingEMGSApproval = nextStep(
-//   "PHD",
-//   "registration_fees",
-//   PHD
-// );
-// exports.goToNextStepAfterregistrationFees = nextStep(
-//   "PHD",
-//   "getting_final_acceptance_letter",
-//   PHD
-// );
-// exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
-//   "PHD",
-//   "recieving_ticket_copy",
-//   PHD
-// );
-// exports.goToNextStepAfterrecievingTicketCopy = nextStep(
-//   "PHD",
-//   "applying_for_visa",
-//   PHD
-// );
-// exports.goToNextStepAfterapplyingForVisa = nextStep(
-//   "PHD",
-//   "arranging_airport_pickup",
-//   PHD
-// );

@@ -98,6 +98,7 @@ exports.sendRequest = (Model, ModelName) =>
         PersonalStatement: req.body.PersonalStatement,
         CountryOfStudy: req.body.CountryOfStudy,
         RequiredSpecialization: req.body.RequiredSpecialization,
+        additionalService: req.body.additionalService,
       };
     }
     if (ModelName === "Master") {
@@ -116,6 +117,7 @@ exports.sendRequest = (Model, ModelName) =>
         ResearchProposal: req.body.ResearchProposal,
         CountryOfStudy: req.body.CountryOfStudy,
         RequiredSpecialization: req.body.RequiredSpecialization,
+        additionalService: req.body.additionalService,
       };
     }
     if (ModelName === "PHD") {
@@ -135,6 +137,7 @@ exports.sendRequest = (Model, ModelName) =>
         ResearchProposal: req.body.ResearchProposal,
         CountryOfStudy: req.body.CountryOfStudy,
         RequiredSpecialization: req.body.RequiredSpecialization,
+        additionalService: req.body.additionalService,
       };
     }
 
@@ -310,5 +313,3 @@ exports.checkAuthorityRequest = (Model) =>
 //   const updatedData = updatedDocument.get();
 //   res.status(200).json({ data: updatedData });
 // });
-
-

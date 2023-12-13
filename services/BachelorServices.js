@@ -2,7 +2,6 @@ const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const { Bachelor, User } = require("../models");
-const { nextStep } = require("./progressServices");
 const ApiError = require("../utils/apiError");
 const {
   sendRequest,
@@ -156,6 +155,7 @@ exports.updateBachelorByUser = asyncHandler(async (req, res, next) => {
       PersonalStatement: req.body.PersonalStatement,
       CountryOfStudy: req.body.CountryOfStudy,
       RequiredSpecialization: req.body.RequiredSpecialization,
+      additionalService: req.body.additionalService,
     },
     {
       where: { id },
@@ -191,55 +191,3 @@ exports.getAllBachelors = getAll(Bachelor, "Bachelor", [
 // Delete One Bachelor
 exports.deleteBachelor = deleteOne(Bachelor);
 
-// exports.moveToNextStepBechlor = nextStep(Bachelor);
-
-// exports.goToNextStepAftercontractFees = nextStep(
-//   "Bachelor",
-//   "sending_offerLetter",
-//   Bachelor
-// );
-// exports.goToNextStepAftersendingOfferLetter = nextStep(
-//   "Bachelor",
-//   "deliver_and_sign_offerLetter",
-//   Bachelor
-// );
-// exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
-//   "Bachelor",
-//   "get_copy_of_mohere",
-//   Bachelor
-// );
-// exports.goToNextStepAftergetCopyOfMohere = nextStep(
-//   "Bachelor",
-//   "visa_fees",
-//   Bachelor
-// );
-// exports.goToNextStepAftervisaFees = nextStep(
-//   "Bachelor",
-//   "getting_EMGS_approval",
-//   Bachelor
-// );
-// exports.goToNextStepAftergettingEMGSApproval = nextStep(
-//   "Bachelor",
-//   "registration_fees",
-//   Bachelor
-// );
-// exports.goToNextStepAfterregistrationFees = nextStep(
-//   "Bachelor",
-//   "getting_final_acceptance_letter",
-//   Bachelor
-// );
-// exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
-//   "Bachelor",
-//   "recieving_ticket_copy",
-//   Bachelor
-// );
-// exports.goToNextStepAfterrecievingTicketCopy = nextStep(
-//   "Bachelor",
-//   "applying_for_visa",
-//   Bachelor
-// );
-// exports.goToNextStepAfterapplyingForVisa = nextStep(
-//   "Bachelor",
-//   "arranging_airport_pickup",
-//   Bachelor
-// );
