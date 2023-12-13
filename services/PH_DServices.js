@@ -10,7 +10,7 @@ const {
   getOne,
   getAll,
   deleteOne,
-  checkAuthorityRequest
+  checkAuthorityRequest,
 } = require("./handlerFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
@@ -197,7 +197,7 @@ exports.getPhDById = getOne(PHD, [
   {
     model: User,
     as: "Employee",
-  }
+  },
 ]);
 
 // update request (eligible or not eligible)
@@ -211,7 +211,7 @@ exports.getAllPhDs = getAll(PHD, "PHD", [
   {
     model: User,
     as: "Employee",
-  }
+  },
 ]);
 
 //update PHD by user that have made the request
@@ -274,51 +274,53 @@ exports.updatePHDByUser = asyncHandler(async (req, res, next) => {
 // Delete One PhD
 exports.deletePhD = deleteOne(PHD);
 
-exports.goToNextStepAftersignContract = nextStep("PHD", "contract_fees", PHD);
 
-exports.goToNextStepAftercontractFees = nextStep(
-  "PHD",
-  "sending_offerLetter",
-  PHD
-);
-exports.goToNextStepAftersendingOfferLetter = nextStep(
-  "PHD",
-  "deliver_and_sign_offerLetter",
-  PHD
-);
-exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
-  "PHD",
-  "get_copy_of_mohere",
-  PHD
-);
-exports.goToNextStepAftergetCopyOfMohere = nextStep("PHD", "visa_fees", PHD);
-exports.goToNextStepAftervisaFees = nextStep(
-  "PHD",
-  "getting_EMGS_approval",
-  PHD
-);
-exports.goToNextStepAftergettingEMGSApproval = nextStep(
-  "PHD",
-  "registration_fees",
-  PHD
-);
-exports.goToNextStepAfterregistrationFees = nextStep(
-  "PHD",
-  "getting_final_acceptance_letter",
-  PHD
-);
-exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
-  "PHD",
-  "recieving_ticket_copy",
-  PHD
-);
-exports.goToNextStepAfterrecievingTicketCopy = nextStep(
-  "PHD",
-  "applying_for_visa",
-  PHD
-);
-exports.goToNextStepAfterapplyingForVisa = nextStep(
-  "PHD",
-  "arranging_airport_pickup",
-  PHD
-);
+
+// exports.moveToNextStepPHd = nextStep(PHD);
+
+// exports.goToNextStepAftercontractFees = nextStep(
+//   "PHD",
+//   "sending_offerLetter",
+//   PHD
+// );
+// exports.goToNextStepAftersendingOfferLetter = nextStep(
+//   "PHD",
+//   "deliver_and_sign_offerLetter",
+//   PHD
+// );
+// exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
+//   "PHD",
+//   "get_copy_of_mohere",
+//   PHD
+// );
+// exports.goToNextStepAftergetCopyOfMohere = nextStep("PHD", "visa_fees", PHD);
+// exports.goToNextStepAftervisaFees = nextStep(
+//   "PHD",
+//   "getting_EMGS_approval",
+//   PHD
+// );
+// exports.goToNextStepAftergettingEMGSApproval = nextStep(
+//   "PHD",
+//   "registration_fees",
+//   PHD
+// );
+// exports.goToNextStepAfterregistrationFees = nextStep(
+//   "PHD",
+//   "getting_final_acceptance_letter",
+//   PHD
+// );
+// exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
+//   "PHD",
+//   "recieving_ticket_copy",
+//   PHD
+// );
+// exports.goToNextStepAfterrecievingTicketCopy = nextStep(
+//   "PHD",
+//   "applying_for_visa",
+//   PHD
+// );
+// exports.goToNextStepAfterapplyingForVisa = nextStep(
+//   "PHD",
+//   "arranging_airport_pickup",
+//   PHD
+// );

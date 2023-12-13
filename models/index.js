@@ -78,11 +78,6 @@ PHD.belongsTo(RequestDoc, {
   as: "RequestDocumentDetails",
 });
 
-//for user and order
-User.hasMany(Order, { as: "userOrders", foreignKey: "UserId" });
-Order.belongsTo(User, { as: "userOrders", foreignKey: "UserId" });
-// ... (the rest of your code)
-
 // relationship between User and Notification
 User.hasMany(Notification, { foreignKey: "UserId", as: "notifications" });
 Notification.belongsTo(User, { foreignKey: "UserId", as: "UserNotification" });
@@ -92,4 +87,4 @@ db.sync({ force: false }).then(() => {
   console.log("Tables Created");
 });
 
-module.exports = { User, Bachelor, Master, PHD, RequestDoc, Notification };
+module.exports = { User, Bachelor, Master, PHD, RequestDoc, Notification ,Order};

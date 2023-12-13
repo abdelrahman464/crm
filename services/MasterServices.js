@@ -272,58 +272,58 @@ exports.updateMasterByUser = asyncHandler(async (req, res, next) => {
 // Delete One Bachelor
 exports.deleteMaster = deleteOne(Master);
 
-exports.goToNextStepAftersignContract = nextStep(
-  "Master",
-  "contract_fees",
-  Master
-);
-exports.goToNextStepAftercontractFees = nextStep(
-  "Master",
-  "sending_offerLetter",
-  Master
-);
-exports.goToNextStepAftersendingOfferLetter = nextStep(
-  "Master",
-  "deliver_and_sign_offerLetter",
-  Master
-);
-exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
-  "Master",
-  "get_copy_of_mohere",
-  Master
-);
-exports.goToNextStepAftergetCopyOfMohere = nextStep(
-  "Master",
-  "visa_fees",
-  Master
-);
-exports.goToNextStepAftervisaFees = nextStep(
-  "Master",
-  "getting_EMGS_approval",
-  Master
-);
-exports.goToNextStepAftergettingEMGSApproval = nextStep(
-  "Master",
-  "registration_fees",
-  Master
-);
-exports.goToNextStepAfterregistrationFees = nextStep(
-  "Master",
-  "getting_final_acceptance_letter",
-  Master
-);
-exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
-  "Master",
-  "recieving_ticket_copy",
-  Master
-);
-exports.goToNextStepAfterrecievingTicketCopy = nextStep(
-  "Master",
-  "applying_for_visa",
-  Master
-);
-exports.goToNextStepAfterapplyingForVisa = nextStep(
-  "Master",
-  "arranging_airport_pickup",
-  Master
-);
+// exports.goToNextStepAftersignContract = nextStep(
+//   "Master",
+//   "contract_fees",
+//   Master
+// );
+// exports.goToNextStepAftercontractFees = nextStep(
+//   "Master",
+//   "sending_offerLetter",
+//   Master
+// );
+// exports.goToNextStepAftersendingOfferLetter = nextStep(
+//   "Master",
+//   "deliver_and_sign_offerLetter",
+//   Master
+// );
+// exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
+//   "Master",
+//   "get_copy_of_mohere",
+//   Master
+// );
+// exports.goToNextStepAftergetCopyOfMohere = nextStep(
+//   "Master",
+//   "visa_fees",
+//   Master
+// );
+// exports.goToNextStepAftervisaFees = nextStep(
+//   "Master",
+//   "getting_EMGS_approval",
+//   Master
+// );
+// exports.goToNextStepAftergettingEMGSApproval = nextStep(
+//   "Master",
+//   "registration_fees",
+//   Master
+// );
+// exports.goToNextStepAfterregistrationFees = nextStep(
+//   "Master",
+//   "getting_final_acceptance_letter",
+//   Master
+// );
+// exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
+//   "Master",
+//   "recieving_ticket_copy",
+//   Master
+// );
+// exports.goToNextStepAfterrecievingTicketCopy = nextStep(
+//   "Master",
+//   "applying_for_visa",
+//   Master
+// );
+// exports.goToNextStepAfterapplyingForVisa = nextStep(
+//   "Master",
+//   "arranging_airport_pickup",
+//   Master
+// );

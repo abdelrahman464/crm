@@ -58,6 +58,10 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    additionalService: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     currentStep: {
       type: DataTypes.ENUM(
         "sign_contract", //1-make fuction for user to upload his signed Contract  //2-make one for employee to check and move him

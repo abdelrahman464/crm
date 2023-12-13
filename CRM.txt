@@ -1,4 +1,44 @@
 // 12 DEC 
+1-we need to avail employee to asign money 
 
-1- validation layer
+2- validation layer
 2- webhooks 
+
+//---- Chekout  plan
+
+when employee update status , check on 3 conditions  
+    if matches , send with the requet  fees key 
+
+plan 
+    instead of creating 3 webhooks i will create only one 
+    when webhook is excuted ,
+        1-workaround to detect which invoice it's 
+        2-update order.paidAt 
+        3-move him to next step 
+
+//----  end 
+
+//---- optimize routes 
+  1- send request with (currentStatus , type , requestId )
+  2- make middleware that check currentStatus if in [1,2,3]  validate that he send price key  
+
+
+
+
+  1- remake nextStep function  done 
+        validate on stepName     
+        test
+  2- make only on route in progressService (handle 3 cases) done 
+        test 
+
+
+  
+  make middleware to -->  1-create order when it require and fees           
+
+
+
+
+
+
+prevoiusStep 
+    if we made it we have to validate on next step if is there is order with this requestId and requestType

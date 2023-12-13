@@ -3,20 +3,26 @@ const express = require("express");
 const { protect, allowedTo } = require("../services/authServices");
 const {
   uploads,
+  nextStep,
   uploadContract,
   uploadSignedContract,
   uploadOfferLetter,
   uploadSignedOfferLetter,
   uploadMOHERE,
   resize,
-  webhookCheckoutPayVisaFees,
+  checkoutSessionToPayFees,
   webhookCheckoutPayFees,
-  webhookCheckoutRegistrationFees,
   uploadTicket,
   applyForVisa,
 } = require("../services/progressServices");
 
 const router = express.Router();
+
+//validation for employee
+//validation for current step if require any fees
+router
+  .route("/nextStep/:requestId/:requestType")
+  .put(protect, allowedTo("employee", "admin"), nextStep);
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -72,16 +78,7 @@ router.post(
   express.raw({ type: "application/json" }),
   webhookCheckoutPayFees
 );
-//-----------------------------------------------------------------------------------------------------------------------------
-router.post(
-  "/webhookPayVisaFees",
-  express.raw({ type: "application/json" }),
-  webhookCheckoutPayVisaFees
-);
-//-----------------------------------------------------------------------------------------------------------------------------
-router.post(
-  "/webhookRegistrationFees",
-  express.raw({ type: "application/json" }),
-  webhookCheckoutRegistrationFees
-);
+
+router.put("/checkoutSession", protect, checkoutSessionToPayFees);
+
 module.exports = router;

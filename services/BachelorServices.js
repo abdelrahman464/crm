@@ -191,58 +191,55 @@ exports.getAllBachelors = getAll(Bachelor, "Bachelor", [
 // Delete One Bachelor
 exports.deleteBachelor = deleteOne(Bachelor);
 
-exports.goToNextStepAftersignContract = nextStep(
-  "Bachelor",
-  "contract_fees",
-  Bachelor
-);
-exports.goToNextStepAftercontractFees = nextStep(
-  "Bachelor",
-  "sending_offerLetter",
-  Bachelor
-);
-exports.goToNextStepAftersendingOfferLetter = nextStep(
-  "Bachelor",
-  "deliver_and_sign_offerLetter",
-  Bachelor
-);
-exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
-  "Bachelor",
-  "get_copy_of_mohere",
-  Bachelor
-);
-exports.goToNextStepAftergetCopyOfMohere = nextStep(
-  "Bachelor",
-  "visa_fees",
-  Bachelor
-);
-exports.goToNextStepAftervisaFees = nextStep(
-  "Bachelor",
-  "getting_EMGS_approval",
-  Bachelor
-);
-exports.goToNextStepAftergettingEMGSApproval = nextStep(
-  "Bachelor",
-  "registration_fees",
-  Bachelor
-);
-exports.goToNextStepAfterregistrationFees = nextStep(
-  "Bachelor",
-  "getting_final_acceptance_letter",
-  Bachelor
-);
-exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
-  "Bachelor",
-  "recieving_ticket_copy",
-  Bachelor
-);
-exports.goToNextStepAfterrecievingTicketCopy = nextStep(
-  "Bachelor",
-  "applying_for_visa",
-  Bachelor
-);
-exports.goToNextStepAfterapplyingForVisa = nextStep(
-  "Bachelor",
-  "arranging_airport_pickup",
-  Bachelor
-);
+// exports.moveToNextStepBechlor = nextStep(Bachelor);
+
+// exports.goToNextStepAftercontractFees = nextStep(
+//   "Bachelor",
+//   "sending_offerLetter",
+//   Bachelor
+// );
+// exports.goToNextStepAftersendingOfferLetter = nextStep(
+//   "Bachelor",
+//   "deliver_and_sign_offerLetter",
+//   Bachelor
+// );
+// exports.goToNextStepAfterdeliverAndSignOfferLetter = nextStep(
+//   "Bachelor",
+//   "get_copy_of_mohere",
+//   Bachelor
+// );
+// exports.goToNextStepAftergetCopyOfMohere = nextStep(
+//   "Bachelor",
+//   "visa_fees",
+//   Bachelor
+// );
+// exports.goToNextStepAftervisaFees = nextStep(
+//   "Bachelor",
+//   "getting_EMGS_approval",
+//   Bachelor
+// );
+// exports.goToNextStepAftergettingEMGSApproval = nextStep(
+//   "Bachelor",
+//   "registration_fees",
+//   Bachelor
+// );
+// exports.goToNextStepAfterregistrationFees = nextStep(
+//   "Bachelor",
+//   "getting_final_acceptance_letter",
+//   Bachelor
+// );
+// exports.goToNextStepAftergettingFinalAcceptanceLetter = nextStep(
+//   "Bachelor",
+//   "recieving_ticket_copy",
+//   Bachelor
+// );
+// exports.goToNextStepAfterrecievingTicketCopy = nextStep(
+//   "Bachelor",
+//   "applying_for_visa",
+//   Bachelor
+// );
+// exports.goToNextStepAfterapplyingForVisa = nextStep(
+//   "Bachelor",
+//   "arranging_airport_pickup",
+//   Bachelor
+// );

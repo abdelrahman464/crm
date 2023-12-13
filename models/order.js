@@ -5,7 +5,11 @@ module.exports = (db, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    isPaied: {
+    requestType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isPaid: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
@@ -14,7 +18,7 @@ module.exports = (db, DataTypes) => {
       allowNull: true,
     },
     type: {
-      type: DataTypes.ENUM("contract_fees", "visa_fees","registration_fees"),
+      type: DataTypes.ENUM("contract_fees", "visa_fees", "registration_fees"),
       allowNull: false,
     },
     totalOrderPrice: {
