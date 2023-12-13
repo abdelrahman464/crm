@@ -27,7 +27,15 @@ app.use(compression());
 
 //middlewares
 //pasring the comming data to json
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    if (buf && buf.length > 0) {
+      req.rawBody = buf.toString();
+    } else {
+      req.rawBody = ''; // Set a default value if buf doesn't exist
+    }
+  }
+}));
 //serve static files inside 'uploads'
 app.use(express.static(path.join(__dirname, "uploads")));
 

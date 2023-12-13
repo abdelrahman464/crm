@@ -148,7 +148,7 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
   const { totalOrderPrice } = req.body;
   console.log(req.body);
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -160,7 +160,7 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
     case "master":
       modelToUpdate = Master;
       break;
-    case "phd":
+    case "PhD":
       modelToUpdate = PHD;
       break;
     default:
@@ -272,7 +272,7 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
     case "master":
       modelToUpdate = Master;
       break;
-    case "phd":
+    case "PhD":
       modelToUpdate = PHD;
       break;
     default:
@@ -405,7 +405,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
     case "master":
       Model = Master;
       break;
-    case "phd":
+    case "PhD":
       Model = PHD;
       break;
     default:
@@ -431,7 +431,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
       )
     );
   }
-  const totalFees = order.totalOrderPeice;
+  const totalFees = order.totalOrderPrice;
   //------------------------------
   const session = await stripe.checkout.sessions.create({
     line_items: [
@@ -453,8 +453,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
 
     client_reference_id: requestId,
     metadata: {
-      feesType: request.cuureentStep,
-      requestId: requestId,
+      feesType: request.currentStep,
       requestType: requestType,
     },
   });
@@ -476,7 +475,7 @@ const updateOrderFees = async (session) => {
     case "master":
       Model = Master;
       break;
-    case "phd":
+    case "PhD":
       Model = PHD;
       break;
     default:
@@ -504,21 +503,18 @@ const updateOrderFees = async (session) => {
 // the webhook for pay fees
 exports.webhookCheckoutPayFees = asyncHandler(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
-
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
+    console.log(`Webhook Error: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === "checkout.session.completed") {
-    updateOrderFees(event.data.object);
+    await updateOrderFees(event.data.object);
   }
 
   res.status(200).json({ received: true });
@@ -530,7 +526,7 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
   const { requestId, requestType } = req.params;
   const employeeId = req.user.id;
   // Check if requestType is valid
-  if (!["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid request type`, 400));
   }
 
@@ -684,7 +680,7 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
   const { requestId, requestType } = req.params;
 
   // Check if requestType is valid
-  if (!["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid request type`, 400));
   }
 
@@ -828,14 +824,13 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 //  upload ticket
 //@ role : user
 exports.applyForVisa = asyncHandler(async (req, res, next) => {
   const { requestId } = req.params;
   const requestType = req.user.type;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
