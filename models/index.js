@@ -83,8 +83,16 @@ User.hasMany(Notification, { foreignKey: "UserId", as: "notifications" });
 Notification.belongsTo(User, { foreignKey: "UserId", as: "UserNotification" });
 
 //generate tables in DB
-db.sync({ force: true }).then(() => {
+db.sync({ force: false }).then(() => {
   console.log("Tables Created");
 });
 
-module.exports = { User, Bachelor, Master, PHD, RequestDoc, Notification ,Order};
+module.exports = {
+  User,
+  Bachelor,
+  Master,
+  PHD,
+  RequestDoc,
+  Notification,
+  Order,
+};

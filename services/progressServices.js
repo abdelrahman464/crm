@@ -141,12 +141,13 @@ const steps = [
   "recieving_ticket_copy",
   "applying_for_visa",
   "arranging_airport_pickup",
+  "Done",
 ];
 // eslint-disable-next-line no-shadow
 exports.nextStep = asyncHandler(async (req, res, next) => {
   const { requestId, requestType } = req.params;
   const { totalOrderPrice } = req.body;
-  console.log(req.body);
+  
 
   if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));

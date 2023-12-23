@@ -158,26 +158,31 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
 
 // get request that employee part in
 exports.sendLoggedUserIdToParams = asyncHandler(async (req, res, next) => {
-  req.params.employeeId = req.user.id;
+  if (req.params.user) {
+    req.params.id = req.user.id;
+  }
+  req.params.id = req.user.id;
   next();
 });
 exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
-  const { employeeId } = req.params; // Assuming you're passing employeeId in the route params
+  const { id } = req.params;
+  let queryWhere = {};
+  if (req.user.role === "user") {
+    queryWhere = {
+      where: { UserId: id },
+    };
+  } else {
+    queryWhere = {
+      where: { employeeId: id },
+    };
+  }
+  const bachelorRequests = await Bachelor.findAll(queryWhere);
 
-  const bachelorRequests = await Bachelor.findAll({
-    where: { employeeId },
-  });
+  const masterRequests = await Master.findAll(queryWhere);
 
-  const masterRequests = await Master.findAll({
-    where: { employeeId },
-  });
-
-  const phdRequests = await PHD.findAll({
-    where: { employeeId },
-  });
+  const phdRequests = await PHD.findAll(queryWhere);
 
   const allRequests = [...bachelorRequests, ...masterRequests, ...phdRequests];
 
   res.status(200).json({ data: allRequests });
 });
-

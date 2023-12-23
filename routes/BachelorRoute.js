@@ -35,7 +35,7 @@ router
   .delete(protect, allowedTo("admin"), deleteBachelor)
   .get(
     protect,
-    allowedTo("admin", "user", "employee"), // we need validation to user that make the request who get it
+    allowedTo("admin", "user", "employee"), 
     checkAuthorityRequestBachelor,
     getBachelorById
   )

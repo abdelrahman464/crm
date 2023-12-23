@@ -18,13 +18,13 @@ router
   .route("/remove")
   .put(protect, allowedTo("admin"), removeEmployeeFromRequest);
 router
-  .route("/:employeeId/requests")
+  .route("/:id/requests")
   .get(protect, allowedTo("admin"), getEmployeeRequests);
 router
   .route("/myRequests")
   .get(
     protect,
-    allowedTo("employee"),
+    allowedTo("employee", "user"),
     sendLoggedUserIdToParams,
     getEmployeeRequests
   );

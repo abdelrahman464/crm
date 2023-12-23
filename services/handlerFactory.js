@@ -91,6 +91,7 @@ exports.sendRequest = (Model, ModelName) =>
     if (ModelName === "Bachelor") {
       obj = {
         UserId: req.user.id,
+        title: "Bachelor",
         Passport: req.body.Passport,
         PersonalPicture: req.body.PersonalPicture,
         HighSchoolCertificate: req.body.HighSchoolCertificate,
@@ -104,6 +105,7 @@ exports.sendRequest = (Model, ModelName) =>
     if (ModelName === "Master") {
       obj = {
         UserId: req.user.id,
+        title: "Master",
         Passport: req.body.Passport,
         PersonalPicture: req.body.PersonalPicture,
         CV: req.body.CV,
@@ -123,6 +125,7 @@ exports.sendRequest = (Model, ModelName) =>
     if (ModelName === "PHD") {
       obj = {
         UserId: req.user.id,
+        title: "PHD",
         Passport: req.body.Passport,
         PersonalPicture: req.body.PersonalPicture,
         CV: req.body.CV,
@@ -183,62 +186,65 @@ exports.updateRequestEligibility = (Model) =>
 exports.canSendRequest = asyncHandler(async (req, res, next) => {
   const userId = req.user.id; // Assuming userId is part of the request body
   const request = req.user.type;
+
   if (request === null) {
-    next();
+    return next();
   }
 
-  if (request === "Master") {
-    const masterRequests = await Master.findAll({
+  const checkRequests = async (Model) => {
+    const requests = await Model.findAll({
       where: {
         UserId: userId,
-        Eligibility: "pending",
-      },
-    });
-    // Check if there are pending requests in the Master table
-    if (masterRequests.length > 0) {
-      return next(
-        new ApiError(
-          `You can only send a new request after the previous request is proccessed`,
-          400
-        )
-      );
-    }
-  }
-  if (request === "Bachelor") {
-    const bachelorRequests = await Bachelor.findAll({
-      where: {
-        UserId: userId,
-        Eligibility: "pending",
       },
     });
 
-    // Check if there are pending requests in the Bachelor table
-    if (bachelorRequests.length > 0) {
-      return next(
-        new ApiError(
-          `You can only send a new request after the previous request is proccessed`,
-          400
-        )
+    const hasPendingRequests = requests.some(
+      (r) => r.Eligibility === "pending"
+    );
+
+    const inProgressRequests = requests.some((r) => r.currentStep !== "Done");
+
+    return { hasPendingRequests, inProgressRequests };
+  };
+
+  let errorMessage = "";
+
+  switch (request) {
+    case "Master": {
+      const { hasPendingRequests, inProgressRequests } = await checkRequests(
+        Master
       );
+      if (hasPendingRequests || inProgressRequests) {
+        errorMessage = `You can only send a new request after the previous request is processed`;
+      }
+      break;
     }
-  }
-  if (request === "PhD") {
-    const phdRequests = await PhD.findAll({
-      where: {
-        UserId: userId,
-        Eligibility: "pending",
-      },
-    });
-    // Check if there are pending requests in the PhD table
-    if (phdRequests.length > 0) {
-      return next(
-        new ApiError(
-          `You can only send a new request after the previous request is proccessed`,
-          400
-        )
+    case "Bachelor": {
+      const { hasPendingRequests, inProgressRequests } = await checkRequests(
+        Bachelor
       );
+      if (hasPendingRequests || inProgressRequests) {
+        errorMessage = `You can only send a new request after the previous request is processed`;
+      }
+      break;
     }
+    case "PhD": {
+      const { hasPendingRequests, inProgressRequests } = await checkRequests(
+        PhD
+      );
+      if (hasPendingRequests || inProgressRequests) {
+        errorMessage = `You can only send a new request after the previous request is processed`;
+      }
+      break;
+    }
+    default:
+      break;
   }
+
+  if (errorMessage) {
+    return next(new ApiError(errorMessage, 400));
+  }
+
   next();
 });
 
@@ -290,6 +296,7 @@ exports.checkAuthorityRequest = (Model) =>
         );
       }
     }
+    next();
   });
 
 // exports.updateRequstPrice = (Model) =>
