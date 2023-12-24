@@ -61,7 +61,7 @@ router
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadMOHERE/:requestId/:requestType")
-  .post(protect, allowedTo("employee"), uploads, resize, uploadMOHERE);
+  .post(protect, allowedTo("user"), uploads, resize, uploadMOHERE);
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadTicket/:requestId")
