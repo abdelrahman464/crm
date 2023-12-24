@@ -1,7 +1,8 @@
 const asyncHandler = require("express-async-handler");
 // const ApiError = require("../utils/apiError");
 const { createNotification } = require("./notificationService");
-const { User, Bachelor, Master, PHD } = require("../models");
+const { User, Bachelor, Master, PHD, RequestDoc } = require("../models");
+const handlerFactory = require("./handlerFactory");
 
 //1- assign employee for each request
 //@params     employeeId userId
@@ -188,3 +189,4 @@ exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ data: allRequests });
 });
+exports.getRequestDocById = handlerFactory.getOne(RequestDoc);

@@ -7,6 +7,7 @@ const {
   removeEmployeeFromRequest,
   sendLoggedUserIdToParams,
   getEmployeeRequests,
+  getRequestDocById
 } = require("../services/CrmService");
 
 const router = express.Router();
@@ -17,6 +18,9 @@ router
 router
   .route("/remove")
   .put(protect, allowedTo("admin"), removeEmployeeFromRequest);
+  router
+  .route("/reqDoc/:id")
+  .get(protect, allowedTo("user","admin","employee"), getRequestDocById);
 router
   .route("/:id/requests")
   .get(protect, allowedTo("admin"), getEmployeeRequests);
