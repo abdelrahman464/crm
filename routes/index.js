@@ -11,7 +11,7 @@ const mountRoutes = (app) => {
   // Mount Routes
   app.use("/api/v1/users", userRoute);
   app.use("/api/v1/auth", authRoute);
-  app.use("/api/v1/bechelor", BechlortRoute);
+  app.use("/api/v1/bachelor", BechlortRoute);
   app.use("/api/v1/master", MasterRoute);
   app.use("/api/v1/phd", PHDRoute);
   app.use("/api/v1/progress", ProgressRoute);
