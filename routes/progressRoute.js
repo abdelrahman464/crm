@@ -1,5 +1,12 @@
 const express = require("express");
-
+const {
+  uploadContractValidator,
+  uploadSignedContractValidator,
+  uploadOfferLetterValidator,
+  uploadSignedOfferLetterValidator,
+  uploadMOHEREValidator,
+  uploadTicketValidator,
+} = require("../utils/validators/progessValidator");
 const { protect, allowedTo } = require("../services/authServices");
 const {
   uploads,
@@ -34,6 +41,7 @@ router
     allowedTo("employee", "admin"),
     uploads,
     resize,
+    uploadContractValidator,
     uploadContract
   );
 
@@ -41,7 +49,14 @@ router
 //valid who upload the signed contract is the user who sent request
 router
   .route("/uploadSignedContract/:requestId")
-  .post(protect, allowedTo("user"), uploads, resize, uploadSignedContract);
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadSignedContractValidator,
+    uploadSignedContract
+  );
 
 //-----------------------------------------------------------------------------------------------------------------------------
 router
@@ -52,20 +67,43 @@ router
     allowedTo("employee", "admin"),
     uploads,
     resize,
+    uploadOfferLetterValidator,
     uploadOfferLetter
   );
+
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadSignedOfferLetter/:requestId")
-  .post(protect, allowedTo("user"), uploads, resize, uploadSignedOfferLetter);
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadSignedOfferLetterValidator,
+    uploadSignedOfferLetter
+  );
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadMOHERE/:requestId/:requestType")
-  .post(protect, allowedTo("user"), uploads, resize, uploadMOHERE);
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadMOHEREValidator,
+    uploadMOHERE
+  );
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadTicket/:requestId")
-  .post(protect, allowedTo("user"), uploads, resize, uploadTicket);
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadTicketValidator,
+    uploadTicket
+  );
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/applyForVisa/:requestId")
