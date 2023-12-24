@@ -171,10 +171,12 @@ exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
     queryWhere = {
       where: { UserId: id },
     };
-  } else {
+  } else if (req.user.role === "employee") {
     queryWhere = {
       where: { employeeId: id },
     };
+  } else {
+    queryWhere = {};
   }
   const bachelorRequests = await Bachelor.findAll(queryWhere);
 

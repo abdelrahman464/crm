@@ -24,7 +24,7 @@ router
   .route("/myRequests")
   .get(
     protect,
-    allowedTo("employee", "user"),
+    allowedTo("employee", "user", "admin"),
     sendLoggedUserIdToParams,
     getEmployeeRequests
   );
