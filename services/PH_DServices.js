@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
-const { PHD, User } = require("../models");
+const { PHD, User, RequestDoc } = require("../models");
 const ApiError = require("../utils/apiError");
 const {
   sendRequest,
@@ -197,6 +197,10 @@ exports.getPhDById = getOne(PHD, [
     model: User,
     as: "Employee",
   },
+  {
+    model: RequestDoc,
+    as: "RequestDocumentDetails",
+  },
 ]);
 
 // update request (eligible or not eligible)
@@ -210,6 +214,10 @@ exports.getAllPhDs = getAll(PHD, "PHD", [
   {
     model: User,
     as: "Employee",
+  },
+  {
+    model: RequestDoc,
+    as: "RequestDocumentDetails",
   },
 ]);
 
@@ -272,6 +280,3 @@ exports.updatePHDByUser = asyncHandler(async (req, res, next) => {
 });
 // Delete One PhD
 exports.deletePhD = deleteOne(PHD);
-
-
-

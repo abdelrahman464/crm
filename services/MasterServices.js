@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
-const { Master, User } = require("../models");
+const { Master, User ,RequestDoc} = require("../models");
 const ApiError = require("../utils/apiError");
 const {
   sendRequest,
@@ -194,6 +194,10 @@ exports.getMasterById = getOne(Master, [
     model: User,
     as: "Employee",
   },
+  {
+    model: RequestDoc,
+    as: "RequestDocumentDetails",
+  },
 ]);
 
 // update request (eligible or not eligible)
@@ -208,6 +212,10 @@ exports.getAllMasters = getAll(Master, "Master", [
   {
     model: User,
     as: "Employee",
+  },
+  {
+    model: RequestDoc,
+    as: "RequestDocumentDetails",
   },
 ]);
 
