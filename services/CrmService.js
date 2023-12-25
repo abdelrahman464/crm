@@ -70,7 +70,7 @@ exports.assignEmployeeForRequest = asyncHandler(async (req, res) => {
 
       // Create notification for the employee
       const message = `You have been assigned to a new request (${user.type})`;
-      await createNotification(employee.id, message);
+      await createNotification(employee.id, message ,requestId);
     }
 
     return res.status(200).json({
@@ -142,7 +142,7 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
 
       // Create notification for the employee
       const message = `Your assignment has been removed from a request (${user.type})`;
-      await createNotification(employee.id, message);
+      await createNotification(employee.id, message,requestId);
     }
 
     return res.status(200).json({

@@ -13,6 +13,10 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    payload: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   });
 
   return Notification;

@@ -241,8 +241,8 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
   }
 
   // Create notification
-  const message = `request with ID ${request.id} has been updated to ${nextStep} by ${req.user.username}`;
-  await createNotification(request.UserId, message);
+  const message = `Your request has been updated to ${nextStep} by ${req.user.username}`;
+  await createNotification(request.UserId, message,request.id);
 
   res.status(200).json({
     msg: `Request updated successfully, Current Step is ${nextStep}`,
@@ -300,7 +300,7 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
 
     // Create notification for the user
     const message = `A new contract has been uploaded for your ${requestType} request`;
-    await createNotification(user.id, message);
+    await createNotification(user.id, message,requestId);
   }
 
   return res.status(200).json({
@@ -377,7 +377,7 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
 
   // Create notification for the employee
   const message = `A signed contract has been uploaded for a request "${requestType}" assigned to you, user: ${req.user.username}`;
-  await createNotification(employee.id, message);
+  await createNotification(employee.id, message ,requestId);
 
   // Fetch and return the updated request document
   const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
@@ -481,8 +481,8 @@ const updateOrderFees = async (session) => {
       break;
     default:
   }
-
-  const [updatedRowCount] = await Order.update(
+  
+  const [affectedRowCount] = await Order.update(
     {
       isPaid: true,
       paidAt: Date.now(),
@@ -491,8 +491,8 @@ const updateOrderFees = async (session) => {
       where: { requestId, requestType, type: feesType },
     }
   );
-
-  if (updatedRowCount) {
+  if (affectedRowCount !== 0) {
+    
     //got to next step
     const Therequest = Model.findByPk(requestId);
     const currentStatusIndex = steps.indexOf(Therequest.currentStep);
@@ -591,7 +591,7 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
 
   // Create notification for the user
   const message = `An offer letter has been uploaded for your ${requestType} request`;
-  await createNotification(user.id, message);
+  await createNotification(user.id, message,requestId);
 
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
@@ -664,7 +664,7 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
 
   // Create notification for the employee
   const message = `A signed offer letter has been uploaded for a request "${requestType}" assigned to you, user:${req.user.username}`;
-  await createNotification(employee.id, message);
+  await createNotification(employee.id, message,requestId);
 
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -678,79 +678,74 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
 //  upload MOHERE this if forth step
 //@ role : user
 exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
-  const { requestId, requestType } = req.params;
-
-  // Check if requestType is valid
-  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
-    return next(new ApiError(`Invalid request type`, 400));
-  }
-
-  let requestModel;
-
-  // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
-      requestModel = Bachelor;
-      break;
-    case "Master":
-      requestModel = Master;
-      break;
-    case "PhD":
-      requestModel = PHD;
-      break;
-    default:
-      return next(new ApiError(`Invalid request type`, 400));
-  }
-
-  const request = await requestModel.findOne({
-    where: {
-      id: requestId,
-    },
-  });
-
-  // Check if the request exists
-  if (!request) {
-    return next(new ApiError(`No request found for this user`, 404));
-  }
-  // Ensure the authenticated user sent this request
-  if (request.UserId !== req.user.id) {
-    return next(
-      new ApiError(`Unauthorized: You did not send this request`, 403)
+    const { requestId } = req.params;
+    const requestType = req.user.type;
+    const { MOHERE } = req.body;
+  
+    if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+      return next(new ApiError(`Invalid or missing request type`, 400));
+    }
+  
+    let requestModel;
+  
+    switch (requestType) {
+      case "Bachelor":
+        requestModel = Bachelor;
+        break;
+      case "Master":
+        requestModel = Master;
+        break;
+      case "PhD":
+        requestModel = PHD;
+        break;
+      default:
+        return next(new ApiError(`Invalid request type`, 400));
+    }
+  
+    const request = await requestModel.findOne({
+      where: { id: requestId },
+    });
+  
+    if (!request) {
+      return next(new ApiError(`No request found for this user`, 404));
+    }
+    // Ensure the authenticated user sent this request
+    if (request.UserId !== req.user.id) {
+      return next(
+        new ApiError(`Unauthorized: You did not send this request`, 403)
+      );
+    }
+  
+    if (!request.requestDocId) {
+      return next(new ApiError(`No associated request document found`, 404));
+    }
+  
+    const [updatedRowCount] = await RequestDoc.update(
+      { MOHERE },
+      { where: { id: request.requestDocId } }
     );
-  }
-  // Check if there is a requestDocId associated with the request
-  if (!request.requestDocId) {
-    return next(new ApiError(`No associated request document found`, 404));
-  }
-
-  // Update the RequestDoc with the MOHERE document
-  const [updatedRowCount] = await RequestDoc.update(
-    { MOHERE: req.body.MOHERE },
-    { where: { id: request.requestDocId } }
-  );
-
-  if (updatedRowCount === 0) {
-    return next(new ApiError(`Failed to update request document`, 500));
-  }
-
-  // Fetch the employee associated with the request
-  const employee = await User.findByPk(request.employeeId);
-
-  if (!employee) {
-    return next(new ApiError(`Employee Not Found`, 404));
-  }
-
-  // Create notification for the employee
-  const message = `A MOHERE document has been uploaded for a request assigned to you`;
-  await createNotification(employee.id, message);
-
-  // Fetch the updated RequestDoc
-  const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
-
-  return res.status(200).json({
-    message: "MOHERE uploaded successfully",
-    requestDoc: updatedRequestDoc,
-  });
+  
+    if (updatedRowCount === 0) {
+      return next(new ApiError(`Failed to update request document`, 500));
+    }
+  
+    // Fetch the employee associated with the request
+    const employee = await User.findByPk(request.employeeId);
+  
+    if (!employee) {
+      return next(new ApiError(`Employee Not Found`, 404));
+    }
+  
+    // Create notification for the employee
+    const message = `A MOHERE has been uploaded for a request "${requestType}" assigned to you, user:${req.user.username}`;
+    await createNotification(employee.id, message,requestId);
+  
+    const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
+  
+    return res.status(200).json({
+      message: "Signed offer letter uploaded successfully",
+      requestDoc: updatedRequestDoc,
+    });
 });
 
 //  upload ticket
@@ -815,7 +810,7 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
 
   // Create notification for the employee
   const message = `A ticket document has been uploaded for a request assigned to you, user:${req.user.username}`;
-  await createNotification(employee.id, message);
+  await createNotification(employee.id, message,requestId);
 
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -886,7 +881,7 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
 
   // Create notification for the employee
   const message = `A visa application has been requested for a request assigned to you, user:${req.user.username}`;
-  await createNotification(employee.id, message);
+  await createNotification(employee.id, message, requestId);
 
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -896,4 +891,4 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
   });
 });
 
-//------------------------------------------------------------------------------------end step 8 --------------------------------------------
+//------------------------------------------------------------------------------------end step 8 -------------------------------------------- 

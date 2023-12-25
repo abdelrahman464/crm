@@ -84,7 +84,7 @@ router
   );
 //-----------------------------------------------------------------------------------------------------------------------------
 router
-  .route("/uploadMOHERE/:requestId/:requestType")
+  .route("/uploadMOHERE/:requestId")
   .post(
     protect,
     allowedTo("user"),

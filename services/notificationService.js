@@ -45,12 +45,10 @@ exports.deleteNotification = asyncHandler(async (req, res, next) => {
 
   // Check if the authenticated user is the owner of the notification
   if (notification.UserId !== userId) {
-    return res
-      .status(403)
-      .json({
-        success: false,
-        message: "Not authorized to delete this notification",
-      });
+    return res.status(403).json({
+      success: false,
+      message: "Not authorized to delete this notification",
+    });
   }
 
   // Delete the notification if the user is authorized
@@ -100,10 +98,11 @@ exports.markNotificationAsRead = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Notification marked as read" });
 });
 
-exports.createNotification = async (UserId, message) => {
+exports.createNotification = async (UserId, message, payload) => {
   const notification = await Notification.create({
     UserId,
     message,
+    payload,
   });
   return notification;
 };
