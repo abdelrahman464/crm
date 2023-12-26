@@ -6,6 +6,8 @@ const {
   getLoggedUserNotifications,
   deleteNotification,
   markNotificationAsRead,
+  markAllNotificationsAsRead,
+  getUnreadNotificationCount
 } = require("../services/notificationService");
 
 const router = express.Router();
@@ -13,5 +15,7 @@ const router = express.Router();
 router.route("/myNotification").get(protect, getLoggedUserNotifications);
 router.route("/:id").delete(protect, deleteNotification);
 router.route("/:notificationId/read").put(protect, markNotificationAsRead);
+router.route("/markAllsAsRead").put(protect, markAllNotificationsAsRead);
+router.route("/countUnread").get(protect, getUnreadNotificationCount);
 
 module.exports = router;

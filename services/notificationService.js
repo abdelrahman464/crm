@@ -98,6 +98,45 @@ exports.markNotificationAsRead = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Notification marked as read" });
 });
 
+// Function to get the number of unread notifications for a user
+exports.getUnreadNotificationCount = asyncHandler(async (req, res, next) => {
+  const UserId = req.user.id;
+
+  // Find count of unread notifications for the user
+  const unreadCount = await Notification.count({
+    where: {
+      UserId,
+      isRead: false, // Filter for unread notifications
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    unreadCount,
+  });
+});
+
+// Function to mark all notifications as read for a user
+exports.markAllNotificationsAsRead = asyncHandler(async (req, res, next) => {
+  const UserId = req.user.id;
+
+  // Update all unread notifications for the user to mark them as read
+  const updatedNotifications = await Notification.update(
+    { isRead: true },
+    {
+      where: {
+        UserId,
+        isRead: false, // Filter for unread notifications
+      },
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: `${updatedNotifications[0]} notifications marked as read`,
+  });
+});
+
 exports.createNotification = async (UserId, message, payload) => {
   const notification = await Notification.create({
     UserId,
