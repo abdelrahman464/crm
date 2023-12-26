@@ -70,7 +70,7 @@ exports.assignEmployeeForRequest = asyncHandler(async (req, res) => {
 
       // Create notification for the employee
       const message = `You have been assigned to a new request (${user.type})`;
-      await createNotification(employee.id, message ,requestId);
+      await createNotification(employee.id, message, requestId);
     }
 
     return res.status(200).json({
@@ -142,7 +142,7 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
 
       // Create notification for the employee
       const message = `Your assignment has been removed from a request (${user.type})`;
-      await createNotification(employee.id, message,requestId);
+      await createNotification(employee.id, message, requestId);
     }
 
     return res.status(200).json({
@@ -168,13 +168,29 @@ exports.sendLoggedUserIdToParams = asyncHandler(async (req, res, next) => {
 exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   let queryWhere = {};
+  const include = [
+    {
+      model: User,
+      as: "UserDetails",
+    },
+    {
+      model: User,
+      as: "Employee",
+    },
+    {
+      model: RequestDoc,
+      as: "RequestDocumentDetails",
+    },
+  ];
   if (req.user.role === "user") {
     queryWhere = {
       where: { UserId: id },
+      include,
     };
   } else if (req.user.role === "employee") {
     queryWhere = {
       where: { employeeId: id },
+      include,
     };
   } else {
     queryWhere = {};
