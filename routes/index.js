@@ -6,6 +6,7 @@ const PHDRoute=require('./PHDRoute')
 const ProgressRoute=require('./progressRoute')
 const CrmRoute=require('./CrmRoute')
 const NotificationRoute=require('./notificationRoute')
+const orderRoute=require('./orderRoute')
 
 const mountRoutes = (app) => {
   // Mount Routes
@@ -17,5 +18,6 @@ const mountRoutes = (app) => {
   app.use("/api/v1/progress", ProgressRoute);
   app.use("/api/v1/crm", CrmRoute);
   app.use("/api/v1/notification", NotificationRoute);
+  app.use("/api/v1/order", orderRoute);
 };
 module.exports = mountRoutes;
