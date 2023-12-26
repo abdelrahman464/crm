@@ -193,7 +193,7 @@ exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
       include,
     };
   } else {
-    queryWhere = {};
+    queryWhere = {include};
   }
   const bachelorRequests = await Bachelor.findAll(queryWhere);
 
