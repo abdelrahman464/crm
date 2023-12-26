@@ -12,6 +12,6 @@ const router = express.Router();
 router.route("/").get(protect, allowedTo("admin"), getAllOrders);
 router
   .route("/:requestId/:requestType")
-  .get(protect, allowedTo("admin", "employee"), getAllRequestOrders);
+  .get(protect, allowedTo("admin", "employee", "user"), getAllRequestOrders);
 
 module.exports = router;
