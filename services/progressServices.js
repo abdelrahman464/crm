@@ -421,12 +421,12 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
   const order = await Order.findOne({
     requestId,
     requestType,
-    type: request.cuureentStep,
+    type: request.currentStep,
   });
   if (!order) {
     return next(
       new ApiError(
-        `your employee didn't assign you ${request.cuureentStep}`,
+        `your employee didn't assign you ${request.currentStep}`,
         404
       )
     );
