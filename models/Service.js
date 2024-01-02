@@ -5,19 +5,11 @@ module.exports = (db, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    title_ar: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    title_en: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     description_ar: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    description_en: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
