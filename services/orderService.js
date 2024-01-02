@@ -1,11 +1,38 @@
+const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const { Order, Bachelor, Master, PHD } = require("../models"); // Assuming your Sequelize models are appropriately imported
 const ApiError = require("../utils/apiError");
 
-exports.getAllOrders = asyncHandler(async (req, res, next) => {
-  const allOrders = await Order.findAll();
-  res.status(200).json({ success: true, orders: allOrders });
+// Function to validate if a date is in correct format
+function isValidDate(date) {
+  return date instanceof Date && !Number.isNaN(date);
+}
+
+exports.getOrdersBetweenDates = asyncHandler(async (req, res, next) => {
+  const { startDate, endDate } = req.body;
+
+  // Default values if startDate and/or endDate are not provided
+  const defaultStartDate = startDate ? new Date(startDate) : new Date(0);
+  const defaultEndDate = endDate ? new Date(endDate) : new Date();
+
+  // Validate that startDate and endDate are in correct format
+  if (!isValidDate(defaultStartDate) || !isValidDate(defaultEndDate)) {
+    return res.status(400).json({ success: false, error: 'Invalid date format provided' });
+  }
+
+  // Find all orders between the provided start and end dates
+  const ordersBetweenDates = await Order.findAll({
+    where: {
+      createdAt: {
+        [Op.between]: [defaultStartDate, defaultEndDate],
+      },
+      isPaid: true,
+    },
+  });
+
+  res.status(200).json({ success: true, orders: ordersBetweenDates });
 });
+
 
 exports.getAllRequestOrders = asyncHandler(async (req, res, next) => {
   const { requestId, requestType } = req.params; // Assuming userId is passed as a parameter

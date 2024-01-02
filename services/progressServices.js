@@ -29,6 +29,18 @@ exports.uploads = uploadMixOfImages([
     maxCount: 1,
   },
   {
+    name: "MOHEREApproval",
+    maxCount: 1,
+  },
+  {
+    name: "EVAL",
+    maxCount: 1,
+  },
+  {
+    name: "EMGS",
+    maxCount: 1,
+  },
+  {
     name: "applyingForVisa",
     maxCount: 1,
   },
@@ -94,6 +106,39 @@ exports.resize = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Invalid MOHERE file format", 400));
     }
   }
+  if (req.files.MOHEREApproval) {
+    const pdfFile = req.files.MOHEREApproval[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `MOHEREApproval-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/MOHEREApproval/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.MOHEREApproval = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid MOHERE Approval file format", 400));
+    }
+  }
+  if (req.files.EVAL) {
+    const pdfFile = req.files.EVAL[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `EVAL-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/EVAL/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.EVAL = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid EVAL file format", 400));
+    }
+  }
+  if (req.files.EMGS) {
+    const pdfFile = req.files.EMGS[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `EMGS-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/EMGS/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.EMGS = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid EMGS file format", 400));
+    }
+  }
   if (req.files.ticket) {
     const pdfFile = req.files.ticket[0];
     if (pdfFile.mimetype === "application/pdf") {
@@ -134,6 +179,8 @@ const steps = [
   "sending_offerLetter",
   "deliver_and_sign_offerLetter",
   "get_copy_of_mohere",
+  "mohere_approval",
+  "EVAL",
   "visa_fees",
   "getting_EMGS_approval",
   "registration_fees",
@@ -751,7 +798,246 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
     requestDoc: updatedRequestDoc,
   });
 });
+//  upload MOHERE Approval this if third step
+//@role : employee
+exports.uploadMOHEREApproval = asyncHandler(async (req, res, next) => {
+  const { requestId, requestType } = req.params;
+  const employeeId = req.user.id;
+  // Check if requestType is valid
+  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
+    return next(new ApiError(`Invalid request type`, 400));
+  }
 
+  let requestModel;
+
+  // Select the appropriate model based on the requestType
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: {
+      id: requestId,
+    },
+  });
+
+  // Check if the request exists
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Check if there is a requestDocId associated with the request
+  if (!request.requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+  // Ensure the authenticated employee matches the employee in the request
+  if (employeeId !== request.employeeId) {
+    return next(
+      new ApiError(`Unauthorized: Employee mismatch for this request`, 403)
+    );
+  }
+
+  // Update the RequestDoc with the offer letter
+  const [updatedRowCount] = await RequestDoc.update(
+    { MOHEREApproval: req.body.MOHEREApproval },
+    {
+      where: { id: request.requestDocId },
+    }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the user associated with the request
+  const user = await User.findByPk(request.UserId);
+
+  if (!user) {
+    return next(new ApiError(`User Not Found`, 404));
+  }
+
+  // Create notification for the user
+  const message = `An MOHERE has been uploaded for your ${requestType} request`;
+  await createNotification(user.id, message, requestId);
+
+  // Fetch the updated RequestDoc
+  const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
+
+  return res.status(200).json({
+    message: "MOHERE Approval uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
+//  upload EMGS this if third step
+//@role : employee
+exports.uploadEMGS = asyncHandler(async (req, res, next) => {
+  const { requestId, requestType } = req.params;
+  const employeeId = req.user.id;
+  // Check if requestType is valid
+  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
+    return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  let requestModel;
+
+  // Select the appropriate model based on the requestType
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: {
+      id: requestId,
+    },
+  });
+
+  // Check if the request exists
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Check if there is a requestDocId associated with the request
+  if (!request.requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+  // Ensure the authenticated employee matches the employee in the request
+  if (employeeId !== request.employeeId) {
+    return next(
+      new ApiError(`Unauthorized: Employee mismatch for this request`, 403)
+    );
+  }
+
+  // Update the RequestDoc with the offer letter
+  const [updatedRowCount] = await RequestDoc.update(
+    { EMGS: req.body.EMGS },
+    {
+      where: { id: request.requestDocId },
+    }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the user associated with the request
+  const user = await User.findByPk(request.UserId);
+
+  if (!user) {
+    return next(new ApiError(`User Not Found`, 404));
+  }
+
+  // Create notification for the user
+  const message = `An EMGS has been uploaded for your ${requestType} request`;
+  await createNotification(user.id, message, requestId);
+
+  // Fetch the updated RequestDoc
+  const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
+
+  return res.status(200).json({
+    message: "EMGS uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
+//  upload EVAL this if third step
+//@role : employee
+exports.uploadEVAL = asyncHandler(async (req, res, next) => {
+  const { requestId, requestType } = req.params;
+  const employeeId = req.user.id;
+  // Check if requestType is valid
+  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
+    return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  let requestModel;
+
+  // Select the appropriate model based on the requestType
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: {
+      id: requestId,
+    },
+  });
+
+  // Check if the request exists
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Check if there is a requestDocId associated with the request
+  if (!request.requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+  // Ensure the authenticated employee matches the employee in the request
+  if (employeeId !== request.employeeId) {
+    return next(
+      new ApiError(`Unauthorized: Employee mismatch for this request`, 403)
+    );
+  }
+
+  // Update the RequestDoc with the offer letter
+  const [updatedRowCount] = await RequestDoc.update(
+    { EVAL: req.body.EVAL },
+    {
+      where: { id: request.requestDocId },
+    }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the user associated with the request
+  const user = await User.findByPk(request.UserId);
+
+  if (!user) {
+    return next(new ApiError(`User Not Found`, 404));
+  }
+
+  // Create notification for the user
+  const message = `An EVAL has been uploaded for your ${requestType} request`;
+  await createNotification(user.id, message, requestId);
+
+  // Fetch the updated RequestDoc
+  const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
+
+  return res.status(200).json({
+    message: "EVAL uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
 //  upload ticket
 //@ role : user
 exports.uploadTicket = asyncHandler(async (req, res, next) => {

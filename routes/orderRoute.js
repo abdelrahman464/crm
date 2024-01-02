@@ -3,13 +3,13 @@ const express = require("express");
 const { protect, allowedTo } = require("../services/authServices");
 
 const {
-  getAllOrders,
+  getOrdersBetweenDates,
   getAllRequestOrders,
 } = require("../services/orderService");
 
 const router = express.Router();
 
-router.route("/").get(protect, allowedTo("admin"), getAllOrders);
+router.route("/").post(protect, allowedTo("admin"), getOrdersBetweenDates);
 router
   .route("/:requestId/:requestType")
   .get(protect, allowedTo("admin", "employee", "user"), getAllRequestOrders);

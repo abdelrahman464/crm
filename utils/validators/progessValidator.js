@@ -31,3 +31,18 @@ exports.uploadTicketValidator = [
   check("ticket").notEmpty().withMessage("Ticket Required"),
   validatorMiddleware,
 ];
+exports.uploadEVALValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("EVAL").notEmpty().withMessage("EVAL Required"),
+  validatorMiddleware,
+];
+exports.uploadMOHEREApprovalValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("MOHEREApproval").notEmpty().withMessage("MOHEREA pproval Required"),
+  validatorMiddleware,
+];
+exports.uploadEMGSValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("EMGS").notEmpty().withMessage("EMGS Required"),
+  validatorMiddleware,
+];

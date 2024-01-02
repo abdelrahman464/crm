@@ -12,13 +12,14 @@ const { createOne, getOne, getAll, deleteOne } = require("./handlerFactory");
 //needs to be updated
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
-  const { username, email, role } = req.body;
+  const { username, email, role ,phone} = req.body;
 
   const [updatedRows] = await User.update(
     {
       username: username,
       email: email,
       role: role,
+      phone: phone,
     },
     {
       where: { id: userId },
@@ -80,12 +81,13 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 //@route PUT /api/v1/user/changeMyData
 //@access private/protect
 exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
-  const { username, email } = req.body;
+  const { username, email,phone } = req.body;
 
   const [updatedRows] = await User.update(
     {
       username: username,
       email: email,
+      phone: phone,
     },
     {
       where: { id: req.user.id },

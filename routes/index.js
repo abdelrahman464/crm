@@ -1,12 +1,14 @@
 const userRoute = require("./userRoute");
 const authRoute = require("./authRoute");
-const BechlortRoute=require('./BachelorRoute')
-const MasterRoute=require('./MasterRoute')
-const PHDRoute=require('./PHDRoute')
-const ProgressRoute=require('./progressRoute')
-const CrmRoute=require('./CrmRoute')
-const NotificationRoute=require('./notificationRoute')
-const orderRoute=require('./orderRoute')
+const BechlortRoute = require("./BachelorRoute");
+const MasterRoute = require("./MasterRoute");
+const PHDRoute = require("./PHDRoute");
+const ProgressRoute = require("./progressRoute");
+const CrmRoute = require("./CrmRoute");
+const NotificationRoute = require("./notificationRoute");
+const orderRoute = require("./orderRoute");
+const countryOfStudyRoute = require("./countryOfStudyRoute");
+const ServiceRoute = require("./ServiceRoute");
 
 const mountRoutes = (app) => {
   // Mount Routes
@@ -19,5 +21,7 @@ const mountRoutes = (app) => {
   app.use("/api/v1/crm", CrmRoute);
   app.use("/api/v1/notification", NotificationRoute);
   app.use("/api/v1/order", orderRoute);
+  app.use("/api/v1/countryOfStudy", countryOfStudyRoute);
+  app.use("/api/v1/service", ServiceRoute);
 };
 module.exports = mountRoutes;

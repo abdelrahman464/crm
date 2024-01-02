@@ -10,12 +10,12 @@ exports.signupValidator = [
     .withMessage("Username should be at least 2 characters")
     .isLength({ max: 100 })
     .withMessage("Username should not exceed 100 characters"),
-    // .custom(async (val) => {
-    //   const user = await User.findOne({ where: { username: val } });
-    //   if (user) {
-    //     throw new Error("Username already in use");
-    //   }
-    // }),
+  // .custom(async (val) => {
+  //   const user = await User.findOne({ where: { username: val } });
+  //   if (user) {
+  //     throw new Error("Username already in use");
+  //   }
+  // }),
 
   check("email")
     .notEmpty()
@@ -28,6 +28,11 @@ exports.signupValidator = [
         throw new Error("Email already in use");
       }
     }),
+  check("phone")
+    .notEmpty()
+    .withMessage("Username is required")
+    .isMobilePhone()
+    .withMessage("Invalid phone number"),
 
   check("password")
     .notEmpty()

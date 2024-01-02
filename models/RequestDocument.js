@@ -30,6 +30,14 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    EVAL: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    EMGS: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     ticket: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -72,6 +80,24 @@ module.exports = (db, DataTypes) => {
         !instance.MOHERE.startsWith(process.env.BASE_URL)
       ) {
         instance.MOHERE = `${process.env.BASE_URL}/RequestDocument/MOHERE/${instance.MOHERE}`;
+      }
+      if (
+        instance.MOHEREApproval &&
+        !instance.MOHEREApproval.startsWith(process.env.BASE_URL)
+      ) {
+        instance.MOHEREApproval = `${process.env.BASE_URL}/RequestDocument/MOHEREApproval/${instance.MOHEREApproval}`;
+      }
+      if (
+        instance.EVAL &&
+        !instance.EVAL.startsWith(process.env.BASE_URL)
+      ) {
+        instance.EVAL = `${process.env.BASE_URL}/RequestDocument/EVAL/${instance.EVAL}`;
+      }
+      if (
+        instance.EMGS &&
+        !instance.EMGS.startsWith(process.env.BASE_URL)
+      ) {
+        instance.EMGS = `${process.env.BASE_URL}/RequestDocument/EMGS/${instance.EMGS}`;
       }
       if (
         instance.ticket &&

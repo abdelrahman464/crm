@@ -6,6 +6,9 @@ const {
   uploadSignedOfferLetterValidator,
   uploadMOHEREValidator,
   uploadTicketValidator,
+  uploadEMGSValidator,
+  uploadMOHEREApprovalValidator,
+  uploadEVALValidator,
 } = require("../utils/validators/progessValidator");
 const { protect, allowedTo } = require("../services/authServices");
 const {
@@ -19,6 +22,9 @@ const {
   resize,
   checkoutSessionToPayFees,
   webhookCheckoutPayFees,
+  uploadMOHEREApproval,
+  uploadEMGS,
+  uploadEVAL,
   uploadTicket,
   applyForVisa,
 } = require("../services/progressServices");
@@ -61,7 +67,6 @@ router
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadOfferLetter/:requestId/:requestType")
-  //-----------------------------------------------------------------------------------------------------------------------------
   .post(
     protect,
     allowedTo("employee", "admin"),
@@ -70,7 +75,6 @@ router
     uploadOfferLetterValidator,
     uploadOfferLetter
   );
-
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadSignedOfferLetter/:requestId")
@@ -92,6 +96,39 @@ router
     resize,
     uploadMOHEREValidator,
     uploadMOHERE
+  );
+//-----------------------------------------------------------------------------------------------------------------------------
+router
+  .route("/uploadEVAL/:requestId/:requestType")
+  .post(
+    protect,
+    allowedTo("employee", "admin"),
+    uploads,
+    resize,
+    uploadEVALValidator,
+    uploadEVAL
+  );
+//-----------------------------------------------------------------------------------------------------------------------------
+router
+  .route("/uploadMOHEREApproval/:requestId/:requestType")
+  .post(
+    protect,
+    allowedTo("employee", "admin"),
+    uploads,
+    resize,
+    uploadMOHEREApprovalValidator,
+    uploadMOHEREApproval
+  );
+//-----------------------------------------------------------------------------------------------------------------------------
+router
+  .route("/uploadEMGS/:requestId/:requestType")
+  .post(
+    protect,
+    allowedTo("employee", "admin"),
+    uploads,
+    resize,
+    uploadEMGSValidator,
+    uploadEMGS
   );
 //-----------------------------------------------------------------------------------------------------------------------------
 router

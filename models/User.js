@@ -20,6 +20,13 @@ module.exports = (db, DataTypes) => {
         isEmail: true,
       },
     },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isNumeric: true,
+      },
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -55,16 +62,15 @@ module.exports = (db, DataTypes) => {
       defaultValue: false,
     },
     role: {
-      type: DataTypes.ENUM("admin", "user","employee"),
+      type: DataTypes.ENUM("admin", "user", "employee"),
       allowNull: false,
       defaultValue: "user",
     },
     type: {
-      type: DataTypes.ENUM("Bachelor","Master", "Ph_D"),
+      type: DataTypes.ENUM("Bachelor", "Master", "Ph_D"),
       allowNull: false,
       defaultValue: "Bachelor",
     },
-   
   });
 
   User.beforeSave(async (user) => {
@@ -75,6 +81,5 @@ module.exports = (db, DataTypes) => {
     user.password = await bcrypt.hash(user.password, 12);
   });
 
-  
   return User;
 };

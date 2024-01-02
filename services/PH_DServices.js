@@ -258,6 +258,7 @@ exports.updatePHDByUser = asyncHandler(async (req, res, next) => {
       ResearchProposal: req.body.ResearchProposal,
       CountryOfStudy: req.body.CountryOfStudy,
       RequiredSpecialization: req.body.RequiredSpecialization,
+      additionalService: req.body.additionalService,
     },
     {
       where: { id },

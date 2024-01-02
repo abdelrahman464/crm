@@ -57,11 +57,19 @@ exports.getAll = (Model, modelName, include) =>
         searchFilter = {
           [Op.or]: [{ username: { [Op.like]: `%${searchQuery}%` } }],
         };
-      } else {
+      }
+      else if ( modelName === "Master" || modelName === "Bachelor" || modelName === "PHD") {
         searchFilter = {
           [Op.or]: [
             { title: { [Op.like]: `%${searchQuery}%` } }, // Case-insensitive partial match on the 'title' field
-            // Add more fields here if you want to search on additional fields
+            { CountryOfStudy: { [Op.like]: `%${searchQuery}%` } },
+            { additionalService: { [Op.like]: `%${searchQuery}%` } },
+          ],
+        };
+      }  else {
+        searchFilter = {
+          [Op.or]: [
+            { title: { [Op.like]: `%${searchQuery}%` } }, 
           ],
         };
       }
@@ -83,7 +91,6 @@ exports.deleteOne = (Model) =>
 
     res.status(204).send();
   });
-///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 exports.sendRequest = (Model, ModelName) =>
   asyncHandler(async (req, res) => {

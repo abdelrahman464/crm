@@ -17,6 +17,8 @@ const PhDModel = require("./Ph_D");
 const RequestDocumentModel = require("./RequestDocument");
 const OrderModel = require("./order");
 const NotificationModel = require("./Notification");
+const ServiceModel = require("./Service");
+const CountryOfStudyModel = require("./CountryOfStudy");
 
 //createa models
 const User = UserModel(db, Sequelize);
@@ -26,6 +28,8 @@ const PHD = PhDModel(db, Sequelize);
 const RequestDoc = RequestDocumentModel(db, Sequelize);
 const Order = OrderModel(db, Sequelize);
 const Notification = NotificationModel(db, Sequelize);
+const Service = ServiceModel(db, Sequelize);
+const CountryOfStudy = CountryOfStudyModel(db, Sequelize);
 
 //define relationships
 //User & Bachelor => relationships (one to many)
@@ -95,4 +99,6 @@ module.exports = {
   RequestDoc,
   Notification,
   Order,
+  Service,
+  CountryOfStudy,
 };

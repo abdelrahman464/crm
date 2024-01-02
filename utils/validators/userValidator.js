@@ -30,7 +30,11 @@ exports.createUserValidator = [
         }
       })
     ),
-
+  check("phone")
+    .notEmpty()
+    .withMessage("Username is required")
+    .isMobilePhone()
+    .withMessage("Invalid phone number"),
   check("password")
     .notEmpty()
     .withMessage("password required")
@@ -57,14 +61,7 @@ exports.updateUserValidator = [
     .isLength({ min: 2 })
     .withMessage("too short User name")
     .isLength({ max: 100 })
-    .withMessage("too long User name")
-    .custom((val) =>
-      User.findOne({ username: val }).then((user) => {
-        if (user.dataValues.username === val) {
-          return Promise.reject(new Error("username already in use"));
-        }
-      })
-    ),
+    .withMessage("too long User name"),
   check("email")
     .optional()
     .isEmail()
@@ -76,7 +73,7 @@ exports.updateUserValidator = [
         }
       })
     ),
-
+  check("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
   check("role").optional(),
   validatorMiddleware,
 ];
@@ -86,14 +83,7 @@ exports.updateLoggedUserValidator = [
     .isLength({ min: 2 })
     .withMessage("too short User name")
     .isLength({ max: 100 })
-    .withMessage("too long User name")
-    .custom((val) =>
-      User.findOne({ username: val }).then((user) => {
-        if (user.dataValues.username === val) {
-          return Promise.reject(new Error("username already in use"));
-        }
-      })
-    ),
+    .withMessage("too long User name"),
   check("email")
     .optional()
     .isEmail()
@@ -105,7 +95,7 @@ exports.updateLoggedUserValidator = [
         }
       })
     ),
-
+  check("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
   validatorMiddleware,
 ];
 exports.changeLoggedUserPasswordValidator = [
