@@ -9,7 +9,7 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description_ar: {
+    description: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
