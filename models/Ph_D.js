@@ -74,6 +74,8 @@ module.exports = (db, DataTypes) => {
         "sending_offerLetter", //4-make function for employee to update this status when offer letter comes
         "deliver_and_sign_offerLetter", //5-make fuction for user to upload his signed offerLetter  //6-make one for employee to check and move him
         "get_copy_of_mohere", //7-make fuction for user to upload his MOHERE    //8-make one for employee to check and move him
+        "mohere_approval",
+        "EVAL",
         "visa_fees", //9- with webhook  he automatically go to next step
         "getting_EMGS_approval", //10- make function for employee to update it to next step
         "registration_fees", //11- with webhook  he automatically go to next step

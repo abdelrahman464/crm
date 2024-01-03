@@ -55,6 +55,8 @@ module.exports = (db, DataTypes) => {
         "get_copy_of_mohere", //7-make fuction for user to upload his MOHERE    //8-make one for employee to check and move him
         "visa_fees", //9- with webhook  he automatically go to next step
         "getting_EMGS_approval", //10- make function for employee to update it to next step
+        "mohere_approval",
+        "EVAL",
         "registration_fees", //11- with webhook  he automatically go to next step
         "getting_final_acceptance_letter", // 12-make function for employee to update it to next step
         "recieving_ticket_copy", //13-make fuction for user to upload his ticket  //14-make one for employee to check and move him
