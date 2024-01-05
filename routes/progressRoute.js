@@ -9,6 +9,9 @@ const {
   uploadEMGSValidator,
   uploadMOHEREApprovalValidator,
   uploadEVALValidator,
+  uploadcontractFeesFileValidator,
+  uploadvisaFeesFileValidator,
+  uploadregistrationFeesFileValidator,
 } = require("../utils/validators/progessValidator");
 const { protect, allowedTo } = require("../services/authServices");
 const {
@@ -27,6 +30,9 @@ const {
   uploadEVAL,
   uploadTicket,
   applyForVisa,
+  uploadcontractFeesFile,
+  uploadvisaFeesFile,
+  uploadregistrationFeesFile,
 } = require("../services/progressServices");
 
 const router = express.Router();
@@ -65,6 +71,43 @@ router
   );
 
 //-----------------------------------------------------------------------------------------------------------------------------
+router
+  .route("/uploadregistrationFeesFile/:requestId")
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadregistrationFeesFileValidator,
+    uploadregistrationFeesFile
+  );
+
+//-----------------------------------------------------------------------------------------------------------------------------
+router
+  .route("/uploadcontractFeesFile/:requestId")
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadcontractFeesFileValidator,
+    uploadcontractFeesFile
+  );
+
+//-----------------------------------------------------------------------------------------------------------------------------
+router
+  .route("/uploadvisaFeesFile/:requestId")
+  .post(
+    protect,
+    allowedTo("user"),
+    uploads,
+    resize,
+    uploadvisaFeesFileValidator,
+    uploadvisaFeesFile
+  );
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
 router
   .route("/uploadOfferLetter/:requestId/:requestType")
   .post(

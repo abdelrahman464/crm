@@ -13,6 +13,10 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    contractFeesFile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     offerLetter: {
       //employee
       type: DataTypes.STRING,
@@ -34,7 +38,15 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    visaFeesFile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     EMGS: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    registrationFeesFile: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -64,6 +76,12 @@ module.exports = (db, DataTypes) => {
         instance.signedContract = `${process.env.BASE_URL}/RequestDocument/signedContract/${instance.signedContract}`;
       }
       if (
+        instance.contractFeesFile &&
+        !instance.contractFeesFile.startsWith(process.env.BASE_URL)
+      ) {
+        instance.contractFeesFile = `${process.env.BASE_URL}/RequestDocument/contractFeesFile/${instance.contractFeesFile}`;
+      }
+      if (
         instance.offerLetter &&
         !instance.offerLetter.startsWith(process.env.BASE_URL)
       ) {
@@ -87,17 +105,23 @@ module.exports = (db, DataTypes) => {
       ) {
         instance.MOHEREApproval = `${process.env.BASE_URL}/RequestDocument/MOHEREApproval/${instance.MOHEREApproval}`;
       }
-      if (
-        instance.EVAL &&
-        !instance.EVAL.startsWith(process.env.BASE_URL)
-      ) {
+      if (instance.EVAL && !instance.EVAL.startsWith(process.env.BASE_URL)) {
         instance.EVAL = `${process.env.BASE_URL}/RequestDocument/EVAL/${instance.EVAL}`;
       }
       if (
-        instance.EMGS &&
-        !instance.EMGS.startsWith(process.env.BASE_URL)
+        instance.visaFeesFile &&
+        !instance.visaFeesFile.startsWith(process.env.BASE_URL)
       ) {
+        instance.visaFeesFile = `${process.env.BASE_URL}/RequestDocument/visaFeesFile/${instance.visaFeesFile}`;
+      }
+      if (instance.EMGS && !instance.EMGS.startsWith(process.env.BASE_URL)) {
         instance.EMGS = `${process.env.BASE_URL}/RequestDocument/EMGS/${instance.EMGS}`;
+      }
+      if (
+        instance.registrationFeesFile &&
+        !instance.registrationFeesFile.startsWith(process.env.BASE_URL)
+      ) {
+        instance.registrationFeesFile = `${process.env.BASE_URL}/RequestDocument/registrationFeesFile/${instance.registrationFeesFile}`;
       }
       if (
         instance.ticket &&

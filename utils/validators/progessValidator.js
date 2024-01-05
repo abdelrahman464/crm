@@ -18,7 +18,16 @@ exports.uploadOfferLetterValidator = [
 ];
 exports.uploadSignedOfferLetterValidator = [
   check("requestId").isUUID().withMessage("Invalid Requst id format"),
-  check("signedOfferLetter").notEmpty().withMessage("Signed OfferLetter Required"),
+  check("signedOfferLetter")
+    .notEmpty()
+    .withMessage("Signed OfferLetter Required"),
+  validatorMiddleware,
+];
+exports.uploadcontractFeesFileValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("contractFeesFile")
+    .notEmpty()
+    .withMessage("contract Fees File Required"),
   validatorMiddleware,
 ];
 exports.uploadMOHEREValidator = [
@@ -36,6 +45,11 @@ exports.uploadEVALValidator = [
   check("EVAL").notEmpty().withMessage("EVAL Required"),
   validatorMiddleware,
 ];
+exports.uploadvisaFeesFileValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("visaFeesFile").notEmpty().withMessage("visa Fees File Required"),
+  validatorMiddleware,
+];
 exports.uploadMOHEREApprovalValidator = [
   check("requestId").isUUID().withMessage("Invalid Requst id format"),
   check("MOHEREApproval").notEmpty().withMessage("MOHEREA pproval Required"),
@@ -44,5 +58,12 @@ exports.uploadMOHEREApprovalValidator = [
 exports.uploadEMGSValidator = [
   check("requestId").isUUID().withMessage("Invalid Requst id format"),
   check("EMGS").notEmpty().withMessage("EMGS Required"),
+  validatorMiddleware,
+];
+exports.uploadregistrationFeesFileValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("registrationFeesFile")
+    .notEmpty()
+    .withMessage("registration Fees File Required"),
   validatorMiddleware,
 ];

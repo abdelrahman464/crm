@@ -17,6 +17,10 @@ exports.uploads = uploadMixOfImages([
     maxCount: 1,
   },
   {
+    name: "contractFeesFile",
+    maxCount: 1,
+  },
+  {
     name: "offerLetter",
     maxCount: 1,
   },
@@ -37,7 +41,15 @@ exports.uploads = uploadMixOfImages([
     maxCount: 1,
   },
   {
+    name: "visaFeesFile",
+    maxCount: 1,
+  },
+  {
     name: "EMGS",
+    maxCount: 1,
+  },
+  {
+    name: "registrationFeesFile",
     maxCount: 1,
   },
   {
@@ -71,6 +83,17 @@ exports.resize = asyncHandler(async (req, res, next) => {
       req.body.signedContract = pdfFileName;
     } else {
       return next(new ApiError("Invalid signedContract file format", 400));
+    }
+  }
+  if (req.files.contractFeesFile) {
+    const pdfFile = req.files.contractFeesFile[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `contractFeesFile-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/contractFeesFile/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.contractFeesFile = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid contract Fees File file format", 400));
     }
   }
   if (req.files.offerLetter) {
@@ -128,6 +151,17 @@ exports.resize = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Invalid EVAL file format", 400));
     }
   }
+  if (req.files.visaFeesFile) {
+    const pdfFile = req.files.visaFeesFile[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `visaFeesFile-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/visaFeesFile/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.visaFeesFile = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid visa Fees File file format", 400));
+    }
+  }
   if (req.files.EMGS) {
     const pdfFile = req.files.EMGS[0];
     if (pdfFile.mimetype === "application/pdf") {
@@ -137,6 +171,19 @@ exports.resize = asyncHandler(async (req, res, next) => {
       req.body.EMGS = pdfFileName;
     } else {
       return next(new ApiError("Invalid EMGS file format", 400));
+    }
+  }
+  if (req.files.registrationFeesFile) {
+    const pdfFile = req.files.registrationFeesFile[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `registrationFeesFile-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/registrationFeesFile/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.registrationFeesFile = pdfFileName;
+    } else {
+      return next(
+        new ApiError("Invalid registration Fees File file format", 400)
+      );
     }
   }
   if (req.files.ticket) {
@@ -433,6 +480,84 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
     requestDoc: updatedRequestDoc,
   });
 });
+//  upload contract Fees File this if first step
+//@ role : user
+exports.uploadcontractFeesFile = asyncHandler(async (req, res, next) => {
+  const { requestId } = req.params;
+  const requestType = req.user.type;
+  const { contractFeesFile } = req.body;
+
+  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+    return next(new ApiError(`Invalid or missing request type`, 400));
+  }
+
+  let requestModel;
+
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: { id: requestId },
+  });
+
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
+
+  // gathering data from request
+  const { requestDocId, employeeId } = request;
+
+  if (!requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+
+  // Update the RequestDoc with signedContract
+  const [updatedRowCount] = await RequestDoc.update(
+    { contractFeesFile },
+    { where: { id: requestDocId } }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A contract Fees File has been uploaded for a request "${requestType}" assigned to you, user: ${req.user.username}`;
+  await createNotification(employee.id, message, requestId);
+
+  // Fetch and return the updated request document
+  const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
+
+  return res.status(200).json({
+    message: "Signed contract uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
 
 //---------------------------------------------------------------------------------- end step 1 --------------------------------------------
 
@@ -470,6 +595,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
     requestType,
     type: request.currentStep,
   });
+
   if (!order) {
     return next(
       new ApiError(
@@ -494,8 +620,8 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}`,
-    cancel_url: `${req.protocol}://${req.get("host")}`,
+    success_url: `https://www.hamad-edu.com/profile`,
+    cancel_url: `https://www.hamad-edu.com`,
     customer_email: req.user.email,
 
     client_reference_id: requestId,
@@ -537,6 +663,7 @@ const updateOrderFees = async (session) => {
       where: { requestId, requestType, type: feesType },
     }
   );
+  
 
   if (affectedRowCount !== 0) {
     // Get and update the request's current step
@@ -1038,6 +1165,165 @@ exports.uploadEVAL = asyncHandler(async (req, res, next) => {
     requestDoc: updatedRequestDoc,
   });
 });
+
+//  upload visa Fees File this if first step
+//@ role : user
+exports.uploadvisaFeesFile = asyncHandler(async (req, res, next) => {
+  const { requestId } = req.params;
+  const requestType = req.user.type;
+  const { visaFeesFile } = req.body;
+
+  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+    return next(new ApiError(`Invalid or missing request type`, 400));
+  }
+
+  let requestModel;
+
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: { id: requestId },
+  });
+
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
+
+  // gathering data from request
+  const { requestDocId, employeeId } = request;
+
+  if (!requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+
+  // Update the RequestDoc with signedContract
+  const [updatedRowCount] = await RequestDoc.update(
+    { visaFeesFile },
+    { where: { id: requestDocId } }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A visa Fees File has been uploaded for a request "${requestType}" assigned to you, user: ${req.user.username}`;
+  await createNotification(employee.id, message, requestId);
+
+  // Fetch and return the updated request document
+  const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
+
+  return res.status(200).json({
+    message: "Signed contract uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
+
+//  upload registration Fees File this if first step
+//@ role : user
+exports.uploadregistrationFeesFile = asyncHandler(async (req, res, next) => {
+  const { requestId } = req.params;
+  const requestType = req.user.type;
+  const { registrationFeesFile } = req.body;
+
+  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+    return next(new ApiError(`Invalid or missing request type`, 400));
+  }
+
+  let requestModel;
+
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: { id: requestId },
+  });
+
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Ensure the authenticated user sent this request
+  if (request.UserId !== req.user.id) {
+    return next(
+      new ApiError(`Unauthorized: You did not send this request`, 403)
+    );
+  }
+
+  // gathering data from request
+  const { requestDocId, employeeId } = request;
+
+  if (!requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+
+  // Update the RequestDoc with signedContract
+  const [updatedRowCount] = await RequestDoc.update(
+    { registrationFeesFile },
+    { where: { id: requestDocId } }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the employee associated with the request
+  const employee = await User.findByPk(employeeId);
+
+  if (!employee) {
+    return next(new ApiError(`Employee Not Found`, 404));
+  }
+
+  // Create notification for the employee
+  const message = `A registration Fees File has been uploaded for a request "${requestType}" assigned to you, user: ${req.user.username}`;
+  await createNotification(employee.id, message, requestId);
+
+  // Fetch and return the updated request document
+  const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
+
+  return res.status(200).json({
+    message: "Signed contract uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
+
 //  upload ticket
 //@ role : user
 exports.uploadTicket = asyncHandler(async (req, res, next) => {

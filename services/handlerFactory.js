@@ -57,8 +57,11 @@ exports.getAll = (Model, modelName, include) =>
         searchFilter = {
           [Op.or]: [{ username: { [Op.like]: `%${searchQuery}%` } }],
         };
-      }
-      else if ( modelName === "Master" || modelName === "Bachelor" || modelName === "PHD") {
+      } else if (
+        modelName === "Master" ||
+        modelName === "Bachelor" ||
+        modelName === "PHD"
+      ) {
         searchFilter = {
           [Op.or]: [
             { title: { [Op.like]: `%${searchQuery}%` } }, // Case-insensitive partial match on the 'title' field
@@ -66,11 +69,9 @@ exports.getAll = (Model, modelName, include) =>
             { additionalService: { [Op.like]: `%${searchQuery}%` } },
           ],
         };
-      }  else {
+      } else {
         searchFilter = {
-          [Op.or]: [
-            { title: { [Op.like]: `%${searchQuery}%` } }, 
-          ],
+          [Op.or]: [{ title: { [Op.like]: `%${searchQuery}%` } }],
         };
       }
       filter = { ...filter, ...searchFilter }; // Merge the existing filter with the search filter
@@ -289,7 +290,7 @@ exports.checkAuthorityRequest = (Model) =>
 
     //if employee check if the employee is the one that has been assigned to the request
     if (req.user.role === "employee") {
-      if (document.employeeId !== req.user.id) {
+      if (document.employeeId.toString() !== req.user.id.toString()) {
         return next(
           new ApiError(`You are not allowed to get this document`, 403)
         );
