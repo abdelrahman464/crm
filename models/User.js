@@ -31,6 +31,10 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    comment: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     emailVerifyCode: {
       type: DataTypes.STRING,
     },
@@ -67,9 +71,9 @@ module.exports = (db, DataTypes) => {
       defaultValue: "user",
     },
     type: {
-      type: DataTypes.ENUM("Bachelor", "Master", "Ph_D"),
+      type: DataTypes.ENUM("Bachelor", "Master", "Ph_D","null"),
       allowNull: false,
-      defaultValue: "Bachelor",
+      defaultValue: "null",
     },
   });
 
