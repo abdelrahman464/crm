@@ -476,7 +476,7 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
   const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
 
   return res.status(200).json({
-    message: "Signed contract uploaded successfully",
+    message: "uploadSignedContract uploaded successfully",
     requestDoc: updatedRequestDoc,
   });
 });
@@ -554,7 +554,7 @@ exports.uploadcontractFeesFile = asyncHandler(async (req, res, next) => {
   const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
 
   return res.status(200).json({
-    message: "Signed contract uploaded successfully",
+    message: "contract Fees File uploaded successfully",
     requestDoc: updatedRequestDoc,
   });
 });
@@ -663,7 +663,6 @@ const updateOrderFees = async (session) => {
       where: { requestId, requestType, type: feesType },
     }
   );
-  
 
   if (affectedRowCount !== 0) {
     // Get and update the request's current step
@@ -1240,7 +1239,7 @@ exports.uploadvisaFeesFile = asyncHandler(async (req, res, next) => {
   const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
 
   return res.status(200).json({
-    message: "Signed contract uploaded successfully",
+    message: "visa Fees File uploaded successfully",
     requestDoc: updatedRequestDoc,
   });
 });
@@ -1319,7 +1318,7 @@ exports.uploadregistrationFeesFile = asyncHandler(async (req, res, next) => {
   const updatedRequestDoc = await RequestDoc.findByPk(requestDocId);
 
   return res.status(200).json({
-    message: "Signed contract uploaded successfully",
+    message: "registration Fees File uploaded successfully",
     requestDoc: updatedRequestDoc,
   });
 });

@@ -22,7 +22,7 @@ module.exports = (db, DataTypes) => {
       allowNull: false,
     },
     totalOrderPrice: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2), // 10 total digits, 2 digits after the decimal point
       allowNull: false,
     },
   });
