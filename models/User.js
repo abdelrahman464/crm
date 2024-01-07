@@ -33,7 +33,7 @@ module.exports = (db, DataTypes) => {
     },
     comment: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     emailVerifyCode: {
       type: DataTypes.STRING,
