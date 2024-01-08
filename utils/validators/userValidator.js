@@ -56,24 +56,8 @@ exports.createUserValidator = [
 ];
 exports.updateUserValidator = [
   check("id").isUUID().withMessage("Invalid id format"),
-  body("username")
-    .optional()
-    .isLength({ min: 2 })
-    .withMessage("too short User name")
-    .isLength({ max: 100 })
-    .withMessage("too long User name"),
-  check("email")
-    .optional()
-    .isEmail()
-    .withMessage("Invalid email address")
-    .custom((val) =>
-      User.findOne({ where: { email: val } }).then((user) => {
-        if (user) {
-          return Promise.reject(new Error("E-mail already in user"));
-        }
-      })
-    ),
-  check("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
+  body("comment").optional(),
+
   check("role").optional(),
   validatorMiddleware,
 ];

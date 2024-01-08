@@ -14,14 +14,12 @@ const {
   updateLoggedUserData,
   updateLoggedUserPassword,
   getLoggedUserData,
-  getAllEmployee,
+  createFilterObj,
 } = require("../services/userServices");
 const authServices = require("../services/authServices");
 
 const router = express.Router();
-router
-  .route("/employees")
-  .get(authServices.protect, authServices.allowedTo("admin"), getAllEmployee);
+
 router.get("/getMe", authServices.protect, getLoggedUserData, getUserById);
 router.put(
   "/changeMyPassword",
@@ -37,8 +35,13 @@ router.put(
   updateLoggedUserData
 );
 router
-  .route("/")
-  .get(authServices.protect, authServices.allowedTo("admin"), getAllUsers)
+  .route("/:role?")
+  .get(
+    authServices.protect,
+    authServices.allowedTo("admin", "employee"),
+    createFilterObj,
+    getAllUsers
+  )
   .post(
     authServices.protect,
     authServices.allowedTo("admin"),

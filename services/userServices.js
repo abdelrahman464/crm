@@ -12,14 +12,11 @@ const { createOne, getOne, getAll, deleteOne } = require("./handlerFactory");
 //needs to be updated
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
-  const { username, email, role, phone, comment } = req.body;
+  const { role, comment } = req.body;
 
   const [updatedRows] = await User.update(
     {
-      username: username,
-      email: email,
       role: role,
-      phone: phone,
       comment: comment,
     },
     {
@@ -50,7 +47,15 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
 exports.getUserById = getOne(User);
 
 // Get All Users
-exports.getAllUsers = getAll(User, "User");
+exports.createFilterObj = (req, res, next) => {
+  let filterObject = {};
+  if (req.user.role === "employee") {
+    filterObject = { role: (req.params.role = "user") };
+  } else if (req.params.role) filterObject = { role: req.params.role };
+  req.filterObj = filterObject;
+  next();
+};
+exports.getAllUsers = getAll(User);
 
 // Delete One User
 exports.deleteUser = deleteOne(User);
@@ -109,7 +114,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 //@desc get all employees
 //@route PUT /api/v1/user/employees
 //@access private/protect admin
-exports.getAllEmployee = asyncHandler(async (req, res) => {
-  const documents = await User.findAll({ where: { role: "employee" } });
-  res.status(200).json({ success: true, data: documents });
-});
+// exports.getAllEmployee = asyncHandler(async (req, res) => {
+//   const documents = await User.findAll({ where: { role: "employee" } });
+//   res.status(200).json({ success: true, data: documents });
+// });
