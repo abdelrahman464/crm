@@ -12,11 +12,10 @@ const { createOne, getOne, getAll, deleteOne } = require("./handlerFactory");
 //needs to be updated
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
-  const { role, comment } = req.body;
+  const { comment } = req.body;
 
   const [updatedRows] = await User.update(
     {
-      role: role,
       comment: comment,
     },
     {

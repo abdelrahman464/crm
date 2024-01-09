@@ -52,7 +52,7 @@ router
   .route("/:id")
   .put(
     authServices.protect,
-    authServices.allowedTo("admin"),
+    authServices.allowedTo("admin", "employee"),
     updateUserValidator,
     updateUser
   )
