@@ -18,6 +18,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     phone: req.body.phone,
+    country: req.body.country,
   });
 
   // 2. Generate a verification code
@@ -42,7 +43,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
                          \n ${verifyCode} 
                          \n enter this code to complete the verification 
                          \n thanks for helping us keep your account secure.
-                         \n the E-Website Team`;
+                         \n the Hamad-Education Team`;
     await sendEmail({
       to: newUser.email,
       subject: "Your Verification code (valid for 10 min)",
@@ -91,7 +92,7 @@ exports.generateVerifyCode = asyncHandler(async (req, res, next) => {
                          \n ${verifyCode} 
                          \n enter this code to complete the verification 
                          \n thanks for helping us keep your account secure.
-                         \n the E-Website Team`;
+                         \n the  Hamad-Education Team`;
     await sendEmail({
       to: user.email,
       subject: "Your Verification code (valid for 10 min)",

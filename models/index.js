@@ -19,7 +19,7 @@ const OrderModel = require("./order");
 const NotificationModel = require("./Notification");
 const ServiceModel = require("./Service");
 const CountryOfStudyModel = require("./CountryOfStudy");
-
+const CommentModel = require("./Comment");
 //createa models
 const User = UserModel(db, Sequelize);
 const Bachelor = BachelorModel(db, Sequelize);
@@ -30,6 +30,7 @@ const Order = OrderModel(db, Sequelize);
 const Notification = NotificationModel(db, Sequelize);
 const Service = ServiceModel(db, Sequelize);
 const CountryOfStudy = CountryOfStudyModel(db, Sequelize);
+const Comment = CommentModel(db, Sequelize);
 
 //define relationships
 //User & Bachelor => relationships (one to many)
@@ -86,6 +87,13 @@ PHD.belongsTo(RequestDoc, {
 User.hasMany(Notification, { foreignKey: "UserId", as: "notifications" });
 Notification.belongsTo(User, { foreignKey: "UserId", as: "UserNotification" });
 
+// relationship between User and comments
+User.hasMany(Comment, { as: "Comment", foreignKey: "UserId" });
+Comment.belongsTo(User, { foreignKey: "UserId", as: "UserComments" });
+// relationship between employee and comments
+User.hasMany(Comment, { as: "ManageComment", foreignKey: "employeeId" });
+Comment.belongsTo(User, { as: "EmployeeComments", foreignKey: "employeeId" });
+
 //generate tables in DB
 db.sync({ force: false }).then(() => {
   console.log("Tables Created");
@@ -101,4 +109,5 @@ module.exports = {
   Order,
   Service,
   CountryOfStudy,
+  Comment,
 };

@@ -6,6 +6,7 @@ const { Master, Bachelor, PHD, User, Order, RequestDoc } = require("../models");
 const ApiError = require("../utils/apiError");
 const { createNotification } = require("./notificationService");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
+const sendEmail = require("../utils/sendEmail");
 
 exports.uploads = uploadMixOfImages([
   {
@@ -46,6 +47,10 @@ exports.uploads = uploadMixOfImages([
   },
   {
     name: "EMGS",
+    maxCount: 1,
+  },
+  {
+    name: "finalAcceptanceLetter",
     maxCount: 1,
   },
   {
@@ -151,6 +156,19 @@ exports.resize = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Invalid EVAL file format", 400));
     }
   }
+  if (req.files.finalAcceptanceLetter) {
+    const pdfFile = req.files.finalAcceptanceLetter[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `finalAcceptanceLetter-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/RequestDocument/finalAcceptanceLetter/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.finalAcceptanceLetter = pdfFileName;
+    } else {
+      return next(
+        new ApiError("Invalid final Acceptance Letter file format", 400)
+      );
+    }
+  }
   if (req.files.visaFeesFile) {
     const pdfFile = req.files.visaFeesFile[0];
     if (pdfFile.mimetype === "application/pdf") {
@@ -227,13 +245,13 @@ const steps = [
   "deliver_and_sign_offerLetter",
   "get_copy_of_mohere",
   "mohere_approval",
-  "EVAL",
   "visa_fees",
   "getting_EMGS_approval",
+  "EVAL",
   "registration_fees",
   "getting_final_acceptance_letter",
   "recieving_ticket_copy",
-  "applying_for_visa",
+  "applying_for_SVE",
   "arranging_airport_pickup",
   "Done",
 ];
@@ -267,6 +285,10 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
   }
 
   // Check if the associated user exists
+  const requestUser = await User.findByPk(request.UserId);
+  if (!requestUser) {
+    return next(new ApiError(`User is not Avaliable any more`, 401));
+  }
   //-----------------------------
   //make a middleware for it
   if (req.user.role !== "admin") {
@@ -336,6 +358,12 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
   // Create notification
   const message = `Your request has been updated to ${nextStep} by ${req.user.username}`;
   await createNotification(request.UserId, message, request.id);
+  // send notification to user email
+  await sendEmail({
+    to: requestUser.email,
+    subject: " Hamad-Education Notification",
+    text: message,
+  });
 
   res.status(200).json({
     msg: `Request updated successfully, Current Step is ${nextStep}`,
@@ -394,6 +422,12 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
     // Create notification for the user
     const message = `A new contract has been uploaded for your ${requestType} request`;
     await createNotification(user.id, message, requestId);
+    // send notification to user email
+    await sendEmail({
+      to: user.email,
+      subject: " Hamad-Education Notification",
+      text: message,
+    });
   }
 
   return res.status(200).json({
@@ -769,7 +803,12 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
   // Create notification for the user
   const message = `An offer letter has been uploaded for your ${requestType} request`;
   await createNotification(user.id, message, requestId);
-
+  // send notification to user email
+  await sendEmail({
+    to: user.email,
+    subject: " Hamad-Education Notification",
+    text: message,
+  });
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -995,7 +1034,12 @@ exports.uploadMOHEREApproval = asyncHandler(async (req, res, next) => {
   // Create notification for the user
   const message = `An MOHERE has been uploaded for your ${requestType} request`;
   await createNotification(user.id, message, requestId);
-
+  // send notification to user email
+  await sendEmail({
+    to: user.email,
+    subject: " Hamad-Education Notification",
+    text: message,
+  });
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -1075,7 +1119,12 @@ exports.uploadEMGS = asyncHandler(async (req, res, next) => {
   // Create notification for the user
   const message = `An EMGS has been uploaded for your ${requestType} request`;
   await createNotification(user.id, message, requestId);
-
+  // send notification to user email
+  await sendEmail({
+    to: user.email,
+    subject: " Hamad-Education Notification",
+    text: message,
+  });
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -1155,7 +1204,97 @@ exports.uploadEVAL = asyncHandler(async (req, res, next) => {
   // Create notification for the user
   const message = `An EVAL has been uploaded for your ${requestType} request`;
   await createNotification(user.id, message, requestId);
+  // send notification to user email
+  await sendEmail({
+    to: user.email,
+    subject: " Hamad-Education Notification",
+    text: message,
+  });
+  // Fetch the updated RequestDoc
+  const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
+  return res.status(200).json({
+    message: "EVAL uploaded successfully",
+    requestDoc: updatedRequestDoc,
+  });
+});
+//  upload finalAcceptanceLetter
+//@role : employee
+exports.uploadfinalAcceptanceLetter = asyncHandler(async (req, res, next) => {
+  const { requestId, requestType } = req.params;
+  const employeeId = req.user.id;
+  // Check if requestType is valid
+  if (!["Bachelor", "Master", "PHD"].includes(requestType)) {
+    return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  let requestModel;
+
+  // Select the appropriate model based on the requestType
+  switch (requestType) {
+    case "Bachelor":
+      requestModel = Bachelor;
+      break;
+    case "Master":
+      requestModel = Master;
+      break;
+    case "PhD":
+      requestModel = PHD;
+      break;
+    default:
+      return next(new ApiError(`Invalid request type`, 400));
+  }
+
+  const request = await requestModel.findOne({
+    where: {
+      id: requestId,
+    },
+  });
+
+  // Check if the request exists
+  if (!request) {
+    return next(new ApiError(`No request found for this user`, 404));
+  }
+
+  // Check if there is a requestDocId associated with the request
+  if (!request.requestDocId) {
+    return next(new ApiError(`No associated request document found`, 404));
+  }
+  // Ensure the authenticated employee matches the employee in the request
+  if (employeeId !== request.employeeId) {
+    return next(
+      new ApiError(`Unauthorized: Employee mismatch for this request`, 403)
+    );
+  }
+
+  // Update the RequestDoc with the offer letter
+  const [updatedRowCount] = await RequestDoc.update(
+    { finalAcceptanceLetter: req.body.finalAcceptanceLetter },
+    {
+      where: { id: request.requestDocId },
+    }
+  );
+
+  if (updatedRowCount === 0) {
+    return next(new ApiError(`Failed to update request document`, 500));
+  }
+
+  // Fetch the user associated with the request
+  const user = await User.findByPk(request.UserId);
+
+  if (!user) {
+    return next(new ApiError(`User Not Found`, 404));
+  }
+
+  // Create notification for the user
+  const message = `An EVAL has been uploaded for your ${requestType} request`;
+  await createNotification(user.id, message, requestId);
+  // send notification to user email
+  await sendEmail({
+    to: user.email,
+    subject: " Hamad-Education Notification",
+    text: message,
+  });
   // Fetch the updated RequestDoc
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
@@ -1395,9 +1534,9 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
   });
 });
 
-//  upload ticket
+//  apply for SEV
 //@ role : user
-exports.applyForVisa = asyncHandler(async (req, res, next) => {
+exports.applyFoSEV = asyncHandler(async (req, res, next) => {
   const { requestId } = req.params;
   const requestType = req.user.type;
 
@@ -1439,7 +1578,7 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
   }
 
   const [updatedRowCount] = await RequestDoc.update(
-    { applyingForVisa: 1 },
+    { applyingForSEV: 1 },
     { where: { id: request.requestDocId } }
   );
 
@@ -1461,7 +1600,7 @@ exports.applyForVisa = asyncHandler(async (req, res, next) => {
   const updatedRequestDoc = await RequestDoc.findByPk(request.requestDocId);
 
   return res.status(200).json({
-    message: "Your request for a visa has been sent successfully",
+    message: "Your request for a SVE has been sent successfully",
     requestDoc: updatedRequestDoc,
   });
 });

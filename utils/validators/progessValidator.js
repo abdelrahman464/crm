@@ -60,6 +60,11 @@ exports.uploadEMGSValidator = [
   check("EMGS").notEmpty().withMessage("EMGS Required"),
   validatorMiddleware,
 ];
+exports.uploadfinalAcceptanceLetterValidator = [
+  check("requestId").isUUID().withMessage("Invalid Requst id format"),
+  check("finalAcceptanceLetter").notEmpty().withMessage("final Acceptance Letter Required"),
+  validatorMiddleware,
+];
 exports.uploadregistrationFeesFileValidator = [
   check("requestId").isUUID().withMessage("Invalid Requst id format"),
   check("registrationFeesFile")

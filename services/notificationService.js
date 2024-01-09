@@ -3,7 +3,10 @@ const { Notification } = require("../models");
 
 exports.getLoggedUserNotifications = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const { page = 1, limit = 10 } = req.query;
+  const {
+    page = 1,
+    limit = 1000000000000000000000000000000000000000000000000000000000,
+  } = req.query;
 
   const offset = (page - 1) * limit;
   const notifications = await Notification.findAndCountAll({
@@ -145,3 +148,14 @@ exports.createNotification = async (UserId, message, payload) => {
   });
   return notification;
 };
+
+//get Request Notification
+exports.getRequestNotification = asyncHandler(async (req, res, next) => {
+  const { requestId } = req.params;
+
+  const notifications = await Notification.findAll({
+    where: { payload:requestId },
+  });
+
+  res.status(200).json({ data: notifications });
+});

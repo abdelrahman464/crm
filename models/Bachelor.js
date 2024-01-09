@@ -53,21 +53,20 @@ module.exports = (db, DataTypes) => {
         "sending_offerLetter", //4-make function for employee to update this status when offer letter comes
         "deliver_and_sign_offerLetter", //5-make fuction for user to upload his signed offerLetter  //6-make one for employee to check and move him
         "get_copy_of_mohere", //7-make fuction for user to upload his MOHERE    //8-make one for employee to check and move him
+        "mohere_approval",
         "visa_fees", //9- with webhook  he automatically go to next step
         "getting_EMGS_approval", //10- make function for employee to update it to next step
-        "mohere_approval",
         "EVAL",
         "registration_fees", //11- with webhook  he automatically go to next step
         "getting_final_acceptance_letter", // 12-make function for employee to update it to next step
         "recieving_ticket_copy", //13-make fuction for user to upload his ticket  //14-make one for employee to check and move him
-        "applying_for_visa", //14-make one for employee to check and move him and pickup airport ticket or something
-        "arranging_airport_pickup" ,
-        "Done", //thack you
+        "applying_for_SEV", //14-make one for employee to check and move him and pickup airport ticket or something
+        "arranging_airport_pickup",
+        "Done" //thack you
       ),
       defaultValue: "sign_contract",
       allowNull: true,
     },
-
   });
 
   function setUrls(instance) {
@@ -102,7 +101,7 @@ module.exports = (db, DataTypes) => {
       }
     }
   }
-  
+
   // Hook to set the image and PDF URLs after finding a record
   Bachelor.afterFind((instances) => {
     if (Array.isArray(instances)) {
@@ -113,18 +112,17 @@ module.exports = (db, DataTypes) => {
       setUrls(instances);
     }
   });
-  
+
   // Hook to set the image and PDF URLs after creating a new record
   Bachelor.afterCreate((instance) => {
     setUrls(instance);
   });
-  
+
   // Hook to set the image and PDF URLs after updating a record
   Bachelor.afterUpdate((instance) => {
     // Ensure URLs are not modified during update
     setUrls(instance);
   });
-  
 
   return Bachelor;
 };

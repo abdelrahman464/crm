@@ -12,6 +12,7 @@ const {
   uploadcontractFeesFileValidator,
   uploadvisaFeesFileValidator,
   uploadregistrationFeesFileValidator,
+  uploadfinalAcceptanceLetterValidator
 } = require("../utils/validators/progessValidator");
 const { protect, allowedTo } = require("../services/authServices");
 const {
@@ -29,10 +30,11 @@ const {
   uploadEMGS,
   uploadEVAL,
   uploadTicket,
-  applyForVisa,
+  applyFoSEV,
   uploadcontractFeesFile,
   uploadvisaFeesFile,
   uploadregistrationFeesFile,
+  uploadfinalAcceptanceLetter
 } = require("../services/progressServices");
 
 const router = express.Router();
@@ -151,6 +153,17 @@ router
     uploadEVALValidator,
     uploadEVAL
   );
+  //-----------------------------------------------------------------------------------------------------------------------------
+router
+.route("/uploadfinalAcceptanceLetter/:requestId/:requestType")
+.post(
+  protect,
+  allowedTo("employee", "admin"),
+  uploads,
+  resize,
+  uploadfinalAcceptanceLetterValidator,
+  uploadfinalAcceptanceLetter
+);
 //-----------------------------------------------------------------------------------------------------------------------------
 router
   .route("/uploadMOHEREApproval/:requestId/:requestType")
@@ -186,8 +199,8 @@ router
   );
 //-----------------------------------------------------------------------------------------------------------------------------
 router
-  .route("/applyForVisa/:requestId")
-  .post(protect, allowedTo("user"), applyForVisa);
+  .route("/applyForSEV/:requestId")
+  .post(protect, allowedTo("user"), applyFoSEV);
 
 //------------------------WEBHOOKS--------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------

@@ -27,13 +27,13 @@ module.exports = (db, DataTypes) => {
         isNumeric: true,
       },
     },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    comment: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     emailVerifyCode: {
       type: DataTypes.STRING,
@@ -71,7 +71,7 @@ module.exports = (db, DataTypes) => {
       defaultValue: "user",
     },
     type: {
-      type: DataTypes.ENUM("Bachelor", "Master", "Ph_D","null"),
+      type: DataTypes.ENUM("Bachelor", "Master", "Ph_D", "null"),
       allowNull: false,
       defaultValue: "null",
     },

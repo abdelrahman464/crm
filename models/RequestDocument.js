@@ -46,6 +46,10 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    finalAcceptanceLetter: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     registrationFeesFile: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -54,7 +58,7 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    applyingForVisa: {
+    applyingForSEV: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
@@ -107,6 +111,12 @@ module.exports = (db, DataTypes) => {
       }
       if (instance.EVAL && !instance.EVAL.startsWith(process.env.BASE_URL)) {
         instance.EVAL = `${process.env.BASE_URL}/RequestDocument/EVAL/${instance.EVAL}`;
+      }
+      if (
+        instance.finalAcceptanceLetter &&
+        !instance.finalAcceptanceLetter.startsWith(process.env.BASE_URL)
+      ) {
+        instance.finalAcceptanceLetter = `${process.env.BASE_URL}/RequestDocument/finalAcceptanceLetter/${instance.finalAcceptanceLetter}`;
       }
       if (
         instance.visaFeesFile &&
