@@ -8,6 +8,8 @@ const {
   getCountryById,
   updateCountry,
   deleteCountry,
+  uploads,
+  resize,
 } = require("../services/countryOfStudyServices");
 
 const router = express.Router();
@@ -15,11 +17,11 @@ const router = express.Router();
 router
   .route("/")
   .get(getAllCountries)
-  .post(protect, allowedTo("admin"), createCountry);
+  .post(protect, allowedTo("admin"), uploads, resize, createCountry);
 router
   .route("/:id")
   .get(getCountryById)
-  .put(protect, allowedTo("admin"), updateCountry)
+  .put(protect, allowedTo("admin"), uploads, resize, updateCountry)
   .delete(protect, allowedTo("admin"), deleteCountry);
 
 module.exports = router;

@@ -251,7 +251,7 @@ const steps = [
   "registration_fees",
   "getting_final_acceptance_letter",
   "recieving_ticket_copy",
-  "applying_for_SVE",
+  "applying_for_SEV",
   "arranging_airport_pickup",
   "Done",
 ];
