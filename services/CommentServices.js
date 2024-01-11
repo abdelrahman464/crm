@@ -13,6 +13,11 @@ const handlerFactory = require("./handlerFactory");
 
 
 // create  Comment
+exports.sendLoggedEmployeeIdToParams = asyncHandler(async (req, res, next) => {
+ 
+  req.body.employeeId = req.user.id;
+  next();
+});
 exports.createtComment = handlerFactory.createOne(Comment);
 // Delete One Comment
 exports.deleteComment = handlerFactory.deleteOne(Comment);
