@@ -9,6 +9,7 @@ const NotificationRoute = require("./notificationRoute");
 const orderRoute = require("./orderRoute");
 const countryOfStudyRoute = require("./countryOfStudyRoute");
 const ServiceRoute = require("./ServiceRoute");
+const CommentRoute = require("./CommentRoute");
 
 const mountRoutes = (app) => {
   // Mount Routes
@@ -23,5 +24,6 @@ const mountRoutes = (app) => {
   app.use("/api/v1/order", orderRoute);
   app.use("/api/v1/countryOfStudy", countryOfStudyRoute);
   app.use("/api/v1/service", ServiceRoute);
+  app.use("/api/v1/comment", CommentRoute);
 };
 module.exports = mountRoutes;
