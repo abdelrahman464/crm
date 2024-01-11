@@ -154,7 +154,8 @@ exports.getRequestNotification = asyncHandler(async (req, res, next) => {
   const { requestId } = req.params;
 
   const notifications = await Notification.findAll({
-    where: { payload:requestId },
+    where: { payload: requestId },
+    order: [['createdAt', 'ASC']]  // Ordering by the 'createdAt' field in ascending order
   });
 
   res.status(200).json({ data: notifications });
