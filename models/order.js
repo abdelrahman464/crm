@@ -9,6 +9,10 @@ module.exports = (db, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    requestId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     isPaid: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
