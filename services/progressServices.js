@@ -220,28 +220,7 @@ exports.resize = asyncHandler(async (req, res, next) => {
 });
 
 const createOrder = async (requestId, requestType, totalOrderPrice, nextStep) => {
-  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
-    throw new Error(`Invalid or missing request type`);
-  }
-
-  let isValidRequest = false;
-  switch (requestType.toLowerCase()) {
-    case 'bachelor':
-      isValidRequest = await Bachelor.findByPk(requestId) != null;
-      break;
-    case 'master':
-      isValidRequest = await Master.findByPk(requestId) != null;
-      break;
-    case 'phd':
-      isValidRequest = await PHD.findByPk(requestId) != null;
-      break;
-    default:
-      throw new Error('Invalid requestId or requestType');
-  }
-
-  if (!isValidRequest) {
-    throw new Error('Invalid requestId or requestType');
-  }
+ 
   try {
     const order = await Order.create({
       requestId: requestId,
