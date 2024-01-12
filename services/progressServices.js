@@ -219,7 +219,34 @@ exports.resize = asyncHandler(async (req, res, next) => {
   next();
 });
 
-const createOrder = async (requestId, requestType, totalOrderPrice, nextStep) => {
+const createOrder = async (
+  requestId,
+  requestType,
+  totalOrderPrice,
+  nextStep
+) => {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
+    throw new Error(`Invalid or missing request type`);
+  }
+
+  let isValidRequest = false;
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
+      isValidRequest = (await Bachelor.findByPk(requestId)) != null;
+      break;
+    case "master":
+      isValidRequest = (await Master.findByPk(requestId)) != null;
+      break;
+    case "phd":
+      isValidRequest = (await PHD.findByPk(requestId)) != null;
+      break;
+    default:
+      throw new Error("Invalid requestId or requestType");
+  }
+
+  if (!isValidRequest) {
+    throw new Error("Invalid requestId or requestType");
+  }
   try {
     const order = await Order.create({
       requestId: requestId,
@@ -230,10 +257,9 @@ const createOrder = async (requestId, requestType, totalOrderPrice, nextStep) =>
     return order ? true : false;
   } catch (error) {
     console.error("Error creating order:", error);
-    return error;  // Return the error for further inspection
+    return error; // Return the error for further inspection
   }
 };
-
 
 //-----------------------------------------------------------------------------------
 const steps = [
@@ -341,28 +367,28 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
     if (flag === false) {
       return next(new ApiError(`Failed to create order`, 500));
     }
+
+    //-----------------------------------------------
+    // Update the currentStep to the next step
+    const [affectedRowCount] = await modelToUpdate.update(
+      { currentStep: nextStep },
+      { where: { id: requestId } }
+    );
+
+    if (affectedRowCount === 0) {
+      return next(new ApiError(`Document Not Found`, 404));
+    }
+
+    // Create notification
+    const message = `Your request has been updated to ${nextStep} by ${req.user.username}`;
+    await createNotification(request.UserId, message, request.id);
+    // send notification to user email
+    await sendEmail({
+      to: requestUser.email,
+      subject: " Hamad-Education Notification",
+      text: message,
+    });
   }
-  //-----------------------------------------------
-  // Update the currentStep to the next step
-  const [affectedRowCount] = await modelToUpdate.update(
-    { currentStep: nextStep },
-    { where: { id: requestId } }
-  );
-
-  if (affectedRowCount === 0) {
-    return next(new ApiError(`Document Not Found`, 404));
-  }
-
-  // Create notification
-  const message = `Your request has been updated to ${nextStep} by ${req.user.username}`;
-  await createNotification(request.UserId, message, request.id);
-  // send notification to user email
-  await sendEmail({
-    to: requestUser.email,
-    subject: " Hamad-Education Notification",
-    text: message,
-  });
-
   res.status(200).json({
     msg: `Request updated successfully, Current Step is ${nextStep}`,
   });
