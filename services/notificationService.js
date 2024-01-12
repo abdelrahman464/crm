@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { Notification } = require("../models");
 
 exports.getLoggedUserNotifications = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
+  const UserId = req.user.id;
   const {
     page = 1,
     limit = 1000000000000000000000000000000000000000000000000000000000,
@@ -10,7 +10,7 @@ exports.getLoggedUserNotifications = asyncHandler(async (req, res, next) => {
 
   const offset = (page - 1) * limit;
   const notifications = await Notification.findAndCountAll({
-    where: { userId },
+    where: { UserId },
     offset,
     limit,
     order: [["createdAt", "DESC"]], // Sort notifications by createdAt in descending order
