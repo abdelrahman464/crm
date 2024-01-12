@@ -272,7 +272,7 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
     case "master":
       modelToUpdate = Master;
       break;
-    case "PHD":
+    case "phd":
       modelToUpdate = PHD;
       break;
     default:
@@ -394,7 +394,7 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
     case "master":
       modelToUpdate = Master;
       break;
-    case "PHD":
+    case "phd":
       modelToUpdate = PHD;
       break;
     default:
@@ -456,7 +456,7 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -534,7 +534,7 @@ exports.uploadcontractFeesFile = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -611,7 +611,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
     case "master":
       Model = Master;
       break;
-    case "PHD":
+    case "phd":
       Model = PHD;
       break;
     default:
@@ -682,7 +682,7 @@ const updateOrderFees = async (session) => {
     case "master":
       Model = Master;
       break;
-    case "PHD":
+    case "phd":
       Model = PHD;
       break;
     default:
@@ -752,7 +752,7 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -837,7 +837,7 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -911,7 +911,7 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -983,7 +983,7 @@ exports.uploadMOHEREApproval = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1068,7 +1068,7 @@ exports.uploadEMGS = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1153,7 +1153,7 @@ exports.uploadEVAL = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1238,7 +1238,7 @@ exports.uploadfinalAcceptanceLetter = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1324,7 +1324,7 @@ exports.uploadvisaFeesFile = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1403,7 +1403,7 @@ exports.uploadregistrationFeesFile = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1482,7 +1482,7 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -1553,7 +1553,7 @@ exports.applyFoSEV = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PHD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
