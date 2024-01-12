@@ -55,14 +55,14 @@ exports.getAllRequestOrders = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "phd":
       requestModel = PHD;
       break;
     default:
@@ -121,14 +121,14 @@ exports.updateOrderToPaid = asyncHandler(async (req, res, next) => {
   let requestModel;
 
   // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "phd":
       requestModel = PHD;
       break;
     default:

@@ -227,7 +227,7 @@ const createOrder = async (
 ) => {
   const order = await Order.create({
     requestId: requestId,
-    requestType,
+    requestType:requestType,
     type: nextStep,
     totalOrderPrice: totalOrderPeice,
   });
@@ -527,11 +527,11 @@ exports.uploadcontractFeesFile = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -745,11 +745,11 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
   let requestModel;
 
   // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -830,11 +830,11 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -904,11 +904,11 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -976,11 +976,11 @@ exports.uploadMOHEREApproval = asyncHandler(async (req, res, next) => {
   let requestModel;
 
   // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1061,11 +1061,11 @@ exports.uploadEMGS = asyncHandler(async (req, res, next) => {
   let requestModel;
 
   // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1146,11 +1146,11 @@ exports.uploadEVAL = asyncHandler(async (req, res, next) => {
   let requestModel;
 
   // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1159,7 +1159,6 @@ exports.uploadEVAL = asyncHandler(async (req, res, next) => {
     default:
       return next(new ApiError(`Invalid request type`, 400));
   }
-
   const request = await requestModel.findOne({
     where: {
       id: requestId,
@@ -1231,11 +1230,11 @@ exports.uploadfinalAcceptanceLetter = asyncHandler(async (req, res, next) => {
   let requestModel;
 
   // Select the appropriate model based on the requestType
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1317,11 +1316,11 @@ exports.uploadvisaFeesFile = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1396,11 +1395,11 @@ exports.uploadregistrationFeesFile = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1475,11 +1474,11 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
@@ -1546,11 +1545,11 @@ exports.applyFoSEV = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
