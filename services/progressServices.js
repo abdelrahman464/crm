@@ -449,11 +449,11 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
 
   let requestModel;
 
-  switch (requestType) {
-    case "Bachelor":
+  switch (requestType.toLowerCase()) {
+    case "bachelor":
       requestModel = Bachelor;
       break;
-    case "Master":
+    case "master":
       requestModel = Master;
       break;
     case "phd":
