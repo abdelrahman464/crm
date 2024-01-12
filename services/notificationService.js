@@ -3,27 +3,37 @@ const { Notification } = require("../models");
 
 exports.getLoggedUserNotifications = asyncHandler(async (req, res, next) => {
   const UserId = req.user.id;
-  const {
-    page = 1,
-    limit = 1000000000000000000000000000000000000000000000000000000000,
-  } = req.query;
-
-  const offset = (page - 1) * limit;
-  const notifications = await Notification.findAndCountAll({
-    where: { UserId },
-    offset,
-    limit,
+  const notifications = await Notification.findAll({
+    where: { UserId:UserId },
     order: [["createdAt", "DESC"]], // Sort notifications by createdAt in descending order
   });
 
-  const totalPages = Math.ceil(notifications.count / limit);
-
-  res.status(200).json({
+ res.status(200).json({
     success: true,
-    notifications: notifications.rows,
-    totalPages,
-    currentPage: page,
+    notifications,
+
   });
+  // const {
+  //   page = 1,
+  //   limit = 1000000000000000000000000000000000000000000000000000000000,
+  // } = req.query;
+
+  // const offset = (page - 1) * limit;
+  // const notifications = await Notification.findAndCountAll({
+  //   where: { UserId },
+  //   offset,
+  //   limit,
+  //   order: [["createdAt", "DESC"]], // Sort notifications by createdAt in descending order
+  // });
+
+  // const totalPages = Math.ceil(notifications.count / limit);
+
+  // res.status(200).json({
+  //   success: true,
+  //   notifications: notifications.rows,
+  //   totalPages,
+  //   currentPage: page,
+  // });
 });
 
 // exports.getNotificationsByUserId = asyncHandler(async (req, res, next) => {
