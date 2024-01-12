@@ -272,7 +272,7 @@ exports.nextStep = asyncHandler(async (req, res, next) => {
     case "master":
       modelToUpdate = Master;
       break;
-    case "PhD":
+    case "PHD":
       modelToUpdate = PHD;
       break;
     default:
@@ -394,7 +394,7 @@ exports.uploadContract = asyncHandler(async (req, res, next) => {
     case "master":
       modelToUpdate = Master;
       break;
-    case "PhD":
+    case "PHD":
       modelToUpdate = PHD;
       break;
     default:
@@ -443,7 +443,7 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { signedContract } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -456,7 +456,7 @@ exports.uploadSignedContract = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -521,7 +521,7 @@ exports.uploadcontractFeesFile = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { contractFeesFile } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -534,7 +534,7 @@ exports.uploadcontractFeesFile = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -611,7 +611,7 @@ exports.checkoutSessionToPayFees = asyncHandler(async (req, res, next) => {
     case "master":
       Model = Master;
       break;
-    case "PhD":
+    case "PHD":
       Model = PHD;
       break;
     default:
@@ -682,7 +682,7 @@ const updateOrderFees = async (session) => {
     case "master":
       Model = Master;
       break;
-    case "PhD":
+    case "PHD":
       Model = PHD;
       break;
     default:
@@ -752,7 +752,7 @@ exports.uploadOfferLetter = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -824,7 +824,7 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { signedOfferLetter } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -837,7 +837,7 @@ exports.uploadSignedOfferLetter = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -898,7 +898,7 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { MOHERE } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -911,7 +911,7 @@ exports.uploadMOHERE = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -983,7 +983,7 @@ exports.uploadMOHEREApproval = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1068,7 +1068,7 @@ exports.uploadEMGS = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1153,7 +1153,7 @@ exports.uploadEVAL = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1238,7 +1238,7 @@ exports.uploadfinalAcceptanceLetter = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1311,7 +1311,7 @@ exports.uploadvisaFeesFile = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { visaFeesFile } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -1324,7 +1324,7 @@ exports.uploadvisaFeesFile = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1390,7 +1390,7 @@ exports.uploadregistrationFeesFile = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { registrationFeesFile } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -1403,7 +1403,7 @@ exports.uploadregistrationFeesFile = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1469,7 +1469,7 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
   const requestType = req.user.type;
   const { ticket } = req.body;
 
-  if (!requestType || !["Bachelor", "Master", "PhD"].includes(requestType)) {
+  if (!requestType || !["Bachelor", "Master", "PHD"].includes(requestType)) {
     return next(new ApiError(`Invalid or missing request type`, 400));
   }
 
@@ -1482,7 +1482,7 @@ exports.uploadTicket = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
@@ -1553,7 +1553,7 @@ exports.applyFoSEV = asyncHandler(async (req, res, next) => {
     case "Master":
       requestModel = Master;
       break;
-    case "PhD":
+    case "PHD":
       requestModel = PHD;
       break;
     default:
