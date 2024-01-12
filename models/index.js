@@ -89,10 +89,10 @@ Notification.belongsTo(User, { foreignKey: "UserId", as: "UserNotification" });
 
 // relationship between User and comments
 User.hasMany(Comment, { as: "Comment", foreignKey: "UserId" });
-Comment.belongsTo(User, { foreignKey: "UserId", as: "UserComments" });
+Comment.belongsTo(User, { foreignKey: "UserId", as: "User" });
 // relationship between employee and comments
-User.hasMany(Comment, { as: "ManageComment", foreignKey: "employeeId" });
-Comment.belongsTo(User, { as: "EmployeeComments", foreignKey: "employeeId" });
+User.hasMany(Comment, { as: "ManageComment", foreignKey: "creatorId" });
+Comment.belongsTo(User, { as: "creator", foreignKey: "creatorId" });
 
 //generate tables in DB
 db.sync({ force: false }).then(() => {

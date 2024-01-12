@@ -58,6 +58,17 @@ exports.uploads = uploadMixOfImages([
 
 // Processing middleware for resizing and saving BankAccountFile
 exports.resize = asyncHandler(async (req, res, next) => {
+  if (req.files.CV) {
+    const pdfFile = req.files.CV[0];
+    if (pdfFile.mimetype === "application/pdf") {
+      const pdfFileName = `CV-pdf-${uuidv4()}-${Date.now()}.pdf`;
+      const pdfPath = `uploads/Ph_D/cv/${pdfFileName}`;
+      fs.writeFileSync(pdfPath, pdfFile.buffer);
+      req.body.CV = pdfFileName;
+    } else {
+      return next(new ApiError("Invalid CV file format", 400));
+    }
+  }
   if (req.files.Passport) {
     const pdfFile = req.files.Passport[0];
     if (pdfFile.mimetype === "application/pdf") {

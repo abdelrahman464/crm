@@ -6,7 +6,7 @@ const {
   assignEmployeeForRequest,
   removeEmployeeFromRequest,
   sendLoggedUserIdToParams,
-  getEmployeeRequests,
+  getMyRequests,
   getRequestDocById
 } = require("../services/CrmService");
 
@@ -23,14 +23,14 @@ router
   .get(protect, allowedTo("user","admin","employee"), getRequestDocById);
 router
   .route("/:id/requests")
-  .get(protect, allowedTo("admin"), getEmployeeRequests);
+  .get(protect, allowedTo("admin"), getMyRequests);
 router
   .route("/myRequests")
   .get(
     protect,
     allowedTo("employee", "user", "admin"),
     sendLoggedUserIdToParams,
-    getEmployeeRequests
+    getMyRequests
   );
 
 module.exports = router;

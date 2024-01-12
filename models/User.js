@@ -71,7 +71,7 @@ module.exports = (db, DataTypes) => {
       defaultValue: "user",
     },
     type: {
-      type: DataTypes.ENUM("Bachelor", "Master", "Ph_D", "null"),
+      type: DataTypes.ENUM("Bachelor", "Master", "PHD", "null"),
       allowNull: false,
       defaultValue: "null",
     },

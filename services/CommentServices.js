@@ -15,7 +15,7 @@ const handlerFactory = require("./handlerFactory");
 // create  Comment
 exports.sendLoggedEmployeeIdToParams = asyncHandler(async (req, res, next) => {
  
-  req.body.employeeId = req.user.id;
+  req.body.creatorId = req.user.id;
   next();
 });
 exports.createtComment = handlerFactory.createOne(Comment);
@@ -27,11 +27,11 @@ exports.getUserComments = asyncHandler(async (req, res, next) => {
   const include = [
     {
       model: User,
-      as: "EmployeeComments",
+      as: "creator",
     },
     {
       model: User,
-      as: "UserComments",
+      as: "User",
     },
   ];
 

@@ -165,7 +165,7 @@ exports.sendLoggedUserIdToParams = asyncHandler(async (req, res, next) => {
   req.params.id = req.user.id;
   next();
 });
-exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
+exports.getMyRequests = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   let queryWhere = {};
   const include = [
