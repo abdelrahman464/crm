@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { Op } = require("sequelize");
 const { Master, Bachelor, PhD, User } = require("../models");
 const ApiError = require("../utils/apiError");
+const sendEmail = require("../utils/sendEmail");
 
 exports.updateOne = (Model) =>
   asyncHandler(async (req, res, next) => {
@@ -182,10 +183,21 @@ exports.updateRequestEligibility = (Model) =>
     if (!request) {
       return next(new ApiError(`Request not found`, 404));
     }
+    // Check if the associated user exists
+    const requestUser = await User.findByPk(request.UserId);
+    if (!requestUser) {
+      return next(new ApiError(`User is not Avaliable any more`, 401));
+    }
     // Update the Eligibility of the request
     request.Eligibility = Eligibility;
     await request.save();
     // Respond with a success message or the updated request
+    const message = `congratulations Your ${request.title} Request Is Eligible `;
+    await sendEmail({
+      to: requestUser.email,
+      subject: " Hamad-Education Notification",
+      text: message,
+    });
     res
       .status(200)
       .json({ message: "Request status updated successfully", request });
