@@ -219,23 +219,21 @@ exports.resize = asyncHandler(async (req, res, next) => {
   next();
 });
 
-const createOrder = async (
-  requestId,
-  requestType,
-  totalOrderPeice,
-  nextStep
-) => {
-  const order = await Order.create({
-    requestId: requestId,
-    requestType:requestType,
-    type: nextStep,
-    totalOrderPrice: totalOrderPeice,
-  });
-  if (!order) {
-    return false;
+const createOrder = async (requestId, requestType, totalOrderPrice, nextStep) => {
+  try {
+    const order = await Order.create({
+      requestId: requestId,
+      requestType: requestType,
+      type: nextStep,
+      totalOrderPrice: totalOrderPrice,
+    });
+    return order ? true : false;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    return error;  // Return the error for further inspection
   }
-  return true;
 };
+
 
 //-----------------------------------------------------------------------------------
 const steps = [
