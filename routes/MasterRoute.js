@@ -44,7 +44,7 @@ router
 //requset eligibility
 router
   .route("/:id/eligibility")
-  .put(protect, allowedTo("admin"), updateMasterRequestEligibility);
+  .put(protect, allowedTo("admin","employee"), updateMasterRequestEligibility);
 
 //steps
 // router

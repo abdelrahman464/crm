@@ -95,7 +95,7 @@ module.exports = (db, DataTypes) => {
         instance.Passport &&
         !instance.Passport.startsWith(process.env.BASE_URL)
       ) {
-        instance.Passport = `${process.env.BASE_URL}/PH_D/passport/${instance.Passport}`;
+        instance.Passport = `${process.env.BASE_URL}/Master/Passport/${instance.Passport}`;
       }
       if (
         instance.PersonalPicture &&

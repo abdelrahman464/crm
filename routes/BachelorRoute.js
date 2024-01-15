@@ -43,7 +43,7 @@ router
 
 router
   .route("/:id/eligibility")
-  .put(protect, allowedTo("admin"), updateBachelorRequestEligibility);
+  .put(protect, allowedTo("admin","employee"), updateBachelorRequestEligibility);
 
 // router
 //   .route("/goToNextStepAfterapplyingForVisa/:id")

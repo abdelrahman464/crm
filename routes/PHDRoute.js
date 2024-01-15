@@ -15,7 +15,6 @@ const {
   resize,
   updatePhDRequestEligibility,
   deletePhD,
-
 } = require("../services/PH_DServices");
 
 const router = express.Router();
@@ -44,7 +43,7 @@ router
 //elgibility
 router
   .route("/:id/eligibility")
-  .put(protect, allowedTo("admin"), updatePhDRequestEligibility);
+  .put(protect, allowedTo("admin", "employee"), updatePhDRequestEligibility);
 
 //steps
 // router
