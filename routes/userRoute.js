@@ -24,7 +24,6 @@ router.get("/getMe", authServices.protect, getLoggedUserData, getUserById);
 router.put(
   "/changeMyPassword",
   authServices.protect,
-  authServices.allowedTo("admin", "user"),
   changeLoggedUserPasswordValidator,
   updateLoggedUserPassword
 );
@@ -57,6 +56,10 @@ router
     updateUser
   )
   .delete(authServices.protect, authServices.allowedTo("admin"), deleteUser)
-  .get(authServices.protect, authServices.allowedTo("admin"), getUserById);
+  .get(
+    authServices.protect,
+    authServices.allowedTo("admin", "employee"),
+    getUserById
+  );
 
 module.exports = router;
