@@ -5,9 +5,9 @@ const { protect, allowedTo } = require("../services/authServices");
 const {
   assignEmployeeForRequest,
   removeEmployeeFromRequest,
-  sendLoggedUserIdToParams,
+  getEmployeeRequests,
   getMyRequests,
-  getRequestDocById
+  getRequestDocById,
 } = require("../services/CrmService");
 
 const router = express.Router();
@@ -18,19 +18,18 @@ router
 router
   .route("/remove")
   .put(protect, allowedTo("admin"), removeEmployeeFromRequest);
-  router
-  .route("/reqDoc/:id")
-  .get(protect, allowedTo("user","admin","employee"), getRequestDocById);
 router
-  .route("/:id/requests")
-  .get(protect, allowedTo("admin"), getMyRequests);
+  .route("/reqDoc/:id")
+  .get(protect, allowedTo("user", "admin", "employee"), getRequestDocById);
 router
   .route("/myRequests")
   .get(
     protect,
     allowedTo("employee", "user", "admin"),
-    sendLoggedUserIdToParams,
     getMyRequests
   );
+router
+  .route("/:id/requests")
+  .get(protect, allowedTo("admin"), getEmployeeRequests);
 
 module.exports = router;

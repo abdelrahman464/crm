@@ -157,15 +157,51 @@ exports.removeEmployeeFromRequest = asyncHandler(async (req, res) => {
   }
 });
 
-// get request that employee part in
-exports.sendLoggedUserIdToParams = asyncHandler(async (req, res, next) => {
-  if (req.params.user) {
-    req.params.id = req.user.id;
-  }
-  req.params.id = req.user.id;
-  next();
-});
+
 exports.getMyRequests = asyncHandler(async (req, res, next) => {
+  const {id}  = req.user
+  let queryWhere = {};
+  const include = [
+    {
+      model: User,
+      as: "UserDetails",
+    },
+    {
+      model: User,
+      as: "Employee",
+    },
+    {
+      model: RequestDoc,
+      as: "RequestDocumentDetails",
+    },
+  ];
+  if (req.user.role === "user") {
+    queryWhere = {
+      where: { UserId: id },
+      include,
+    };
+  } else if (req.user.role === "employee") {
+    queryWhere = {
+      where: { employeeId: id },
+      include,
+    };
+  } else {
+    queryWhere = {
+      where: { employeeId: id },
+      include,
+    };
+  }
+  const bachelorRequests = await Bachelor.findAll(queryWhere);
+
+  const masterRequests = await Master.findAll(queryWhere);
+
+  const phdRequests = await PHD.findAll(queryWhere);
+
+  const allRequests = [...bachelorRequests, ...masterRequests, ...phdRequests];
+
+  res.status(200).json({ data: allRequests });
+});
+exports.getEmployeeRequests = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   let queryWhere = {};
   const include = [
@@ -193,7 +229,10 @@ exports.getMyRequests = asyncHandler(async (req, res, next) => {
       include,
     };
   } else {
-    queryWhere = {include};
+    queryWhere = {
+      where: { employeeId: id },
+      include,
+    };
   }
   const bachelorRequests = await Bachelor.findAll(queryWhere);
 
